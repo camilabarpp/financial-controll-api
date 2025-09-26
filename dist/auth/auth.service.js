@@ -8,79 +8,47 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
+const jwt_service_1 = require("@nestjs/jwt/dist/jwt.service");
 const user_service_1 = require("../user/user.service");
-const jwt_1 = require("@nestjs/jwt");
-const mailer_1 = require("@nestjs-modules/mailer");
-const moment_1 = __importDefault(require("moment"));
 let AuthService = class AuthService {
-    registerService;
+    userService;
     jwtService;
-    mailerService;
-    constructor(registerService, jwtService, mailerService) {
-        this.registerService = registerService;
+    constructor(userService, jwtService) {
+        this.userService = userService;
         this.jwtService = jwtService;
-        this.mailerService = mailerService;
     }
-    async signIn(credentialsDto) {
-        const user = await this.registerService.checkCredentials(credentialsDto);
+    async register(userData) {
+        return await this.userService.register(userData);
+    }
+    async login(credentialsDto) {
+        const user = await this.userService.checkCredentials(credentialsDto);
         if (user === null) {
-            throw new common_1.UnauthorizedException('Invalid credentials');
+            throw new common_1.UnauthorizedException('Credenciais inválidas');
         }
         const jwtPayload = {
             id: user.id,
         };
-        const token = this.jwtService.sign(jwtPayload);
+        const token = "Bearer " + this.jwtService.sign(jwtPayload);
         return { token };
     }
-    async changePassword(id, changePasswordDto) {
-        const user = await this.registerService.findById(id);
-        if (!user) {
-            throw new common_1.NotFoundException('User not found');
-        }
-        const { password, passwordConfirmation } = changePasswordDto;
-        if (password !== passwordConfirmation) {
-            throw new common_1.UnprocessableEntityException('The passwords do not match');
-        }
-        await this.registerService.changePassword(id, password);
-        const formattedDate = (0, moment_1.default)(user.updatedAt).format('DD/MM/YYYY [às] HH:mm:ss');
-        const mail = {
-            to: user.email,
-            subject: 'Senha alterada com sucesso',
-            text: 'Sua senha foi alterada com sucesso.',
-            template: 'confirmation-change-password',
-            context: {
-                name: user.name,
-                updatedAt: formattedDate,
-            },
-        };
-        await this.mailerService.sendMail(mail);
+    async changePassword(userId, newPassword) {
+        const user = await this.userService.changePassword(userId, newPassword);
     }
-    async resetPassword(recoverToken, changePasswordDto) {
-        const user = await this.registerService.findByRecoverToken(recoverToken);
-        if (!user)
-            throw new common_1.NotFoundException('Invalid token');
-        try {
-            await this.changePassword(user.id.toString(), changePasswordDto);
+    async resetPassword(email) {
+        const user = await this.userService.findUserByEmail(email);
+        if (!user) {
+            throw new Error('User not found');
         }
-        catch (error) {
-            throw error;
-        }
+        const resetToken = this.jwtService.sign({ id: user.id });
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [user_service_1.UserService,
-        jwt_1.JwtService,
-        mailer_1.MailerService])
+        jwt_service_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

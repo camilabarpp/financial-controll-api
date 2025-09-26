@@ -10,46 +10,27 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
-const core_1 = require("@nestjs/core");
-const logger_interceptor_1 = require("./interceptors/logger.interceptor");
-const winston_1 = require("winston");
+const user_module_1 = require("./user/user.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            config_1.ConfigModule.forRoot(),
+            config_1.ConfigModule.forRoot({ isGlobal: true }),
             mongoose_1.MongooseModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: async (configService) => ({
                     uri: configService.get('MONGO_URI'),
                 }),
                 inject: [config_1.ConfigService],
-            })
+            }),
+            user_module_1.UserModule,
+            auth_module_1.AuthModule
         ],
         controllers: [],
-        providers: [
-            {
-                provide: core_1.APP_INTERCEPTOR,
-                useClass: logger_interceptor_1.LoggerInterceptor,
-            },
-            {
-                provide: 'winston',
-                useFactory: () => {
-                    return (0, winston_1.createLogger)({
-                        level: 'info',
-                        format: winston_1.format.combine(winston_1.format.timestamp(), winston_1.format.json()),
-                        transports: [
-                            new winston_1.transports.Console(),
-                        ],
-                    });
-                },
-            },
-        ],
-        exports: [
-            'winston',
-        ],
+        providers: [],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

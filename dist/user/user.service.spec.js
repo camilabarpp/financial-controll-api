@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
 const user_service_1 = require("./user.service");
-describe('RegisterService', () => {
+describe('UserService', () => {
     let service;
     beforeEach(async () => {
         const module = await testing_1.Test.createTestingModule({

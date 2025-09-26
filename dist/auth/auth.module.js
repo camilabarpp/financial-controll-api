@@ -8,30 +8,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
-const user_service_1 = require("../user/user.service");
-const jwt_1 = require("@nestjs/jwt");
+const auth_service_1 = require("./auth.service");
 const passport_1 = require("@nestjs/passport");
-const jwt_strategy_1 = require("./strategies/jwt.strategy");
-const send_mail_service_1 = require("./send-mail/send-mail.service");
-const send_mail_controller_1 = require("./send-mail/send-mail.controller");
+const jwt_strategy_1 = require("../common/strategies/jwt.strategy");
+const jwt_1 = require("@nestjs/jwt");
+const user_module_1 = require("../user/user.module");
+const config_1 = require("@nestjs/config");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule.forRoot(),
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
-            jwt_1.JwtModule.register({
-                privateKey: 'super-secret',
-                signOptions: {
-                    expiresIn: 18000,
-                },
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: async (configService) => ({
+                    secret: configService.get('JWT_SECRET_KEY') || 'default_secret',
+                    signOptions: { expiresIn: 18000 },
+                }),
             }),
+            user_module_1.UserModule,
         ],
-        controllers: [auth_controller_1.AuthController, send_mail_controller_1.SendMailController],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, user_service_1.UserService, send_mail_service_1.SendMailService],
+        controllers: [auth_controller_1.AuthController],
+        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
         exports: [jwt_strategy_1.JwtStrategy, passport_1.PassportModule],
     })
 ], AuthModule);

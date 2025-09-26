@@ -1,18 +1,14 @@
 import { AuthService } from './auth.service';
-import { CredentialsDto } from './dto/credentials-dto';
-import { User } from '../user/entities/user.entity';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateUserDto } from 'src/user/type/user.create.request.type';
+import { UserResponseDTO } from 'src/user/type/user.response.type';
+import { UserCredentialsDto } from 'src/user/type/user.credential.request.type';
+import { User as Profile } from 'src/user/type/user.type';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    signIn(credentialsDto: CredentialsDto): Promise<{
+    signUp(createUserDto: CreateUserDto): Promise<UserResponseDTO>;
+    signIn(credentialsDto: UserCredentialsDto): Promise<{
         token: string;
     }>;
-    getMe(user: User): User;
-    resetPassword(token: string, changePasswordDto: ChangePasswordDto): Promise<{
-        message: string;
-    }>;
-    changePassword(id: string, changePasswordDto: ChangePasswordDto, user: User): Promise<{
-        message: string;
-    }>;
+    getMe(user: Profile): Profile;
 }

@@ -1,31 +1,24 @@
-import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/user-create-dto';
-import { UserRole } from './entities/user-enum';
-import { CredentialsDto } from '../auth/dto/credentials-dto';
-import { UserUpdateDto } from './dto/user-update-dto';
-import { FindUsersQueryDto } from './dto/find-users-query.dto';
-import { MailerService } from '@nestjs-modules/mailer';
+import { Model } from 'mongoose';
+import { User } from './type/user.schema';
+import { UserRole } from './type/user-role.enum';
+import { CreateUserDto } from './type/user.create.request.type';
+import { UserResponseDTO } from './type/user.response.type';
 export declare class UserService {
-    private readonly userRepository;
-    private mailerService;
-    constructor(userRepository: Repository<User>, mailerService: MailerService);
-    findUsers(queryDto: FindUsersQueryDto): Promise<{
-        users: User[];
-        total: number;
-    }>;
-    findUser(queryDto: FindUsersQueryDto): Promise<{
+    private userModel;
+    constructor(userModel: Model<User>);
+    register(createUserDto: CreateUserDto): Promise<UserResponseDTO>;
+    findByToken(token: string): Promise<User | null>;
+    findUserByEmail(email: string): Promise<User>;
+    findUsers(query: any): Promise<{
         users: User[];
         total: number;
     }>;
     findUserById(id: string): Promise<User>;
-    updateUser(updateUserDto: UserUpdateDto, id: string): Promise<User>;
-    createUser(createUserDto: CreateUserDto): Promise<User>;
-    createAdmin(createUserDto: CreateUserDto): Promise<User>;
-    private sendConfirmationEmail;
+    updateUser(updateUserDto: any, id: string): Promise<User>;
     deleteUser(id: string): Promise<void>;
     changePassword(id: string, password: string): Promise<void>;
     private generateHash;
     createAndEncryptPassword(createUserDto: CreateUserDto, role: UserRole): Promise<User>;
-    checkCredentials(credentialsDto: CredentialsDto): Promise<User>;
+    checkCredentials(credentialsDto: any): Promise<User | null>;
+    checkPassword(user: User, password: string): Promise<boolean>;
 }

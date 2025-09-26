@@ -15,15 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
-const user_create_dto_1 = require("./dto/user-create-dto");
-const role_decorator_1 = require("../auth/role.decorator");
-const user_enum_1 = require("./entities/user-enum");
-const user_update_dto_1 = require("./dto/user-update-dto");
-const get_user_decorator_1 = require("../auth/get-user.decorator");
-const user_entity_1 = require("./entities/user.entity");
-const find_users_query_dto_1 = require("./dto/find-users-query.dto");
-const roles_guard_1 = require("../auth/roles.guard");
-const passport_1 = require("@nestjs/passport");
+const user_role_enum_1 = require("./type/user-role.enum");
 let UserController = class UserController {
     userService;
     constructor(userService) {
@@ -33,7 +25,7 @@ let UserController = class UserController {
         const found = await this.userService.findUsers(query);
         return {
             found,
-            message: 'Users founded',
+            message: 'Users found',
         };
     }
     async findUserById(id) {
@@ -43,33 +35,32 @@ let UserController = class UserController {
             message: 'User found successfully!',
         };
     }
-    async updateUser(updateUserDto, user, id) {
-        if (user.role != user_enum_1.UserRole.ADMIN && user.id.toString() != id) {
+    async updateUser(updateUserDto, req, id) {
+        const auth = req.headers['authorization'];
+        if (!auth || !auth.startsWith('Bearer ')) {
+            throw new common_1.ForbiddenException('Not authorized');
+        }
+        const token = auth.replace('Bearer ', '');
+        const user = await this.userService.findByToken(token);
+        if (!user || (user.role !== user_role_enum_1.UserRole.ADMIN && user.id.toString() !== id)) {
             throw new common_1.ForbiddenException('You are not authorized to access this resource.');
         }
-        else {
-            const user = await this.userService.updateUser(updateUserDto, id);
-            return {
-                user,
-                message: 'User updated successfully!',
-            };
+        const updated = await this.userService.updateUser(updateUserDto, id);
+        return {
+            user: updated,
+            message: 'User updated successfully!',
+        };
+    }
+    async deleteUser(id, req) {
+        const auth = req.headers['authorization'];
+        if (!auth || !auth.startsWith('Bearer ')) {
+            throw new common_1.ForbiddenException('Not authorized');
         }
-    }
-    async signUpUser(createUserDto) {
-        const user = await this.userService.createUser(createUserDto);
-        return {
-            user,
-            message: 'User created successfully!',
-        };
-    }
-    async signUpAdmin(createUserDto) {
-        const user = await this.userService.createAdmin(createUserDto);
-        return {
-            user,
-            message: 'Admin created successfully!',
-        };
-    }
-    async deleteUser(id) {
+        const token = auth.replace('Bearer ', '');
+        const user = await this.userService.findByToken(token);
+        if (!user || user.role !== user_role_enum_1.UserRole.ADMIN) {
+            throw new common_1.ForbiddenException('Only admin can delete users');
+        }
         await this.userService.deleteUser(id);
         return {
             message: 'User removed successfully!',
@@ -79,56 +70,37 @@ let UserController = class UserController {
 exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)(),
-    (0, role_decorator_1.Role)(user_enum_1.UserRole.ADMIN),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [find_users_query_dto_1.FindUsersQueryDto]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findUsers", null);
 __decorate([
     (0, common_1.Get)(':id'),
-    (0, role_decorator_1.Role)(user_enum_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findUserById", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, get_user_decorator_1.GetUser)()),
+    __param(1, (0, common_1.Req)()),
     __param(2, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_update_dto_1.UserUpdateDto,
-        user_entity_1.User, String]),
+    __metadata("design:paramtypes", [Object, Object, String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateUser", null);
 __decorate([
-    (0, common_1.Post)('user'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_create_dto_1.CreateUserDto]),
-    __metadata("design:returntype", Promise)
-], UserController.prototype, "signUpUser", null);
-__decorate([
-    (0, common_1.Post)('admin'),
-    (0, role_decorator_1.Role)(user_enum_1.UserRole.ADMIN),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_create_dto_1.CreateUserDto]),
-    __metadata("design:returntype", Promise)
-], UserController.prototype, "signUpAdmin", null);
-__decorate([
     (0, common_1.Delete)(':id'),
-    (0, role_decorator_1.Role)(user_enum_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "deleteUser", null);
 exports.UserController = UserController = __decorate([
-    (0, common_1.Controller)('signUp'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)(), roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('user'),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
 //# sourceMappingURL=user.controller.js.map

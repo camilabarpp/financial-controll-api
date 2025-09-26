@@ -8,23 +8,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
-const user_service_1 = require("./user.service");
+const mongoose_1 = require("@nestjs/mongoose");
 const user_controller_1 = require("./user.controller");
-const typeorm_1 = require("@nestjs/typeorm");
-const user_entity_1 = require("./entities/user.entity");
+const user_service_1 = require("./user.service");
+const user_schema_1 = require("./type/user.schema");
 const passport_1 = require("@nestjs/passport");
-const jwt_strategy_1 = require("../auth/strategies/jwt.strategy");
+const jwt_strategy_1 = require("../common/strategies/jwt.strategy");
 let UserModule = class UserModule {
 };
 exports.UserModule = UserModule;
 exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User]),
-            passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
+            mongoose_1.MongooseModule.forFeature([{ name: user_schema_1.User.name, schema: user_schema_1.UserSchema }]),
+            passport_1.PassportModule.register({ defaultStrategy: 'jwt' })
         ],
-        providers: [user_service_1.UserService, jwt_strategy_1.JwtStrategy],
         controllers: [user_controller_1.UserController],
+        providers: [user_service_1.UserService, jwt_strategy_1.JwtStrategy],
+        exports: [user_service_1.UserService, mongoose_1.MongooseModule],
     })
 ], UserModule);
 //# sourceMappingURL=user.module.js.map

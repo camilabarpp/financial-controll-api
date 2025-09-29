@@ -1,17 +1,18 @@
-import { Injectable, NotFoundException, InternalServerErrorException, UnprocessableEntityException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, UnprocessableEntityException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './type/user.schema';
 import { UserRole } from './type/user-role.enum';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from './type/user.create.request.type';
-import { UserResponseDTO } from './type/user.response.type';
+import { CreateUserDto } from './type/user.create.request';
+import { UserResponseDTO } from './type/user.response';
+import { UpdateUserDto } from './type/user.update.request';
 
 @Injectable()
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-    async register(createUserDto: CreateUserDto): Promise<UserResponseDTO> {
+    async register(createUserDto: CreateUserDto): Promise<User> {
         const existingUser = await this.userModel.findOne({ email: createUserDto.email });
 
         if (existingUser) {
@@ -23,20 +24,10 @@ export class UserService {
                 createUserDto,
                 UserRole.USER
             );
-            return {
-                id: user._id.toString(),
-                name: user.name,
-                email: user.email,
-                avatar: user.avatar || null,
-                role: user.role
-            };
+            return user;
         } catch (error) {
             throw new InternalServerErrorException(`Erro ao salvar usuário: ${error.message}`);
         }
-    }
-
-    async findByToken(token: string): Promise<User | null> {
-        return this.userModel.findOne({ token }).exec();
     }
 
     async findUserByEmail(email: string): Promise<User> {
@@ -45,37 +36,17 @@ export class UserService {
         return user;
     }
 
-    async findUsers(query: any): Promise<{ users: User[]; total: number }> {
-        const { email, name, status = true, role, page = 1, limit = 100, sort } = query;
-        const filter: any = { status };
-        if (email) filter.email = new RegExp(`^${email}`, 'i');
-        if (name) filter.name = new RegExp(`^${name}`, 'i');
-        if (role) filter.role = role;
-
-        const skip = (page - 1) * limit;
-        const users = await this.userModel.find(filter)
-            .skip(skip)
-            .limit(Number(limit))
-            .sort(sort ? JSON.parse(sort) : {})
-            .select('name email role status')
-            .exec();
-        const total = await this.userModel.countDocuments(filter);
-        return { users, total };
-    }
-
-    async findUserById(id: string): Promise<User> {
-        const user = await this.userModel.findById(id).select('email name role id');
-        if (!user) throw new NotFoundException('No user was found with the given ID: ' + id);
-        return user;
-    }
-
-    async updateUser(updateUserDto: any, id: string): Promise<User> {
+    async updateUser(updateUserDto: UpdateUserDto, id: string): Promise<UserResponseDTO> {
+        await this.findUserById(id);
         await this.userModel.updateOne({ _id: id }, updateUserDto);
-        try {
-            return await this.findUserById(id);
-        } catch (error) {
-            throw new InternalServerErrorException('Error saving data to database');
-        }
+        const userUpdated = await this.findUserById(id);
+        return {
+            id: userUpdated._id.toString(),
+            email: userUpdated.email,
+            name: userUpdated.name,
+            avatar: userUpdated.avatar || null,
+            role: userUpdated.role
+        };
     }
 
     async deleteUser(id: string) {
@@ -83,12 +54,37 @@ export class UserService {
         await this.userModel.deleteOne({ _id: id });
     }
 
-    async changePassword(id: string, password: string) {
-        const user = await this.userModel.findById(id);
+    async changePassword(id: string, body: { currentPassword: string, newPassword: string }) {
+        const user = await this.findUserLogged(id);
+
+        const isPasswordMatch = await this.checkPassword(user, body.currentPassword);
+        if (!isPasswordMatch) throw new ForbiddenException('Senha atual está incorreta');
+
         user.salt = await bcrypt.genSalt();
-        user.password = await bcrypt.hash(password, user.salt);
-        user.recoverToken = null;
+        user.password = await bcrypt.hash(body.newPassword, user.salt);
         await user.save();
+    }
+
+    async checkCredentials(credentialsDto: any): Promise<User | null> {
+        const { email, password } = credentialsDto;
+        const user = await this.userModel.findOne({ email, status: true });
+        if (user && (await this.checkPassword(user, password))) {
+            return user;
+        } else {
+            throw new UnauthorizedException('Credenciais inválidas');
+        }
+    }
+
+    async findUserLogged(id: string): Promise<User> {
+        const user = await this.userModel.findById(id).select('email name role id salt password');
+        if (!user) throw new UnauthorizedException('Usuário não encontrado');
+        return user;
+    }
+
+    private async findUserById(id: string): Promise<User> {
+        const user = await this.userModel.findById(id).select('email avatar name role id');
+        if (!user) throw new NotFoundException('Usuário não encontrado');
+        return user;
     }
 
     private async generateHash(password: string): Promise<{ salt: string; hash: string }> {
@@ -97,7 +93,7 @@ export class UserService {
         return { salt, hash };
     }
 
-    async createAndEncryptPassword(createUserDto: CreateUserDto, role: UserRole): Promise<User> {
+    private async createAndEncryptPassword(createUserDto: CreateUserDto, role: UserRole): Promise<User> {
         const { email, name, password } = createUserDto;
         const { salt, hash } = await this.generateHash(password);
         const newUser = new this.userModel({
@@ -118,17 +114,7 @@ export class UserService {
         }
     }
 
-    async checkCredentials(credentialsDto: any): Promise<User | null> {
-        const { email, password } = credentialsDto;
-        const user = await this.userModel.findOne({ email, status: true });
-        if (user && (await this.checkPassword(user, password))) {
-            return user;
-        } else {
-            return null;
-        }
-    }
-
-    async checkPassword(user: User, password: string): Promise<boolean> {
+    private async checkPassword(user: User, password: string): Promise<boolean> {
         const hash = await bcrypt.hash(password, user.salt);
         return hash === user.password;
     }

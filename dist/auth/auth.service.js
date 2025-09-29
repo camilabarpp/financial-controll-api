@@ -21,21 +21,22 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async register(userData) {
-        return await this.userService.register(userData);
+        const user = await this.userService.register(userData);
+        return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            avatar: user.avatar || null,
+            role: user.role
+        };
     }
     async login(credentialsDto) {
         const user = await this.userService.checkCredentials(credentialsDto);
-        if (user === null) {
-            throw new common_1.UnauthorizedException('Credenciais inválidas');
-        }
         const jwtPayload = {
             id: user.id,
         };
         const token = "Bearer " + this.jwtService.sign(jwtPayload);
         return { token };
-    }
-    async changePassword(userId, newPassword) {
-        const user = await this.userService.changePassword(userId, newPassword);
     }
     async resetPassword(email) {
         const user = await this.userService.findUserByEmail(email);

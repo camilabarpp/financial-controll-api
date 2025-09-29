@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const user_create_request_type_1 = require("../user/type/user.create.request.type");
-const user_credential_request_type_1 = require("../user/type/user.credential.request.type");
+const user_create_request_1 = require("../user/type/user.create.request");
+const user_credential_request_1 = require("../user/type/user.credential.request");
 const passport_1 = require("@nestjs/passport");
 const get_user_decorator_1 = require("../common/decorator/get-user.decorator");
 const user_type_1 = require("../user/type/user.type");
@@ -40,14 +40,14 @@ __decorate([
     (0, common_1.Post)('signup'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_create_request_type_1.CreateUserDto]),
+    __metadata("design:paramtypes", [user_create_request_1.CreateUserDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signUp", null);
 __decorate([
     (0, common_1.Post)('signin'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_credential_request_type_1.UserCredentialsDto]),
+    __metadata("design:paramtypes", [user_credential_request_1.UserCredentialsDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signIn", null);
 __decorate([

@@ -1,11 +1,10 @@
 
 import { Controller, Get, UseGuards, Req, Body, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/user/type/user.create.request.type';
-import { UserResponseDTO } from 'src/user/type/user.response.type';
-import { UserCredentialsDto } from 'src/user/type/user.credential.request.type';
+import { CreateUserDto } from 'src/user/type/user.create.request';
+import { UserResponseDTO } from 'src/user/type/user.response';
+import { UserCredentialsDto } from 'src/user/type/user.credential.request';
 import { AuthGuard } from '@nestjs/passport';
-import type { Request } from 'express';
 import { User } from 'src/common/decorator/get-user.decorator';
 import { User as Profile } from 'src/user/type/user.type';
 
@@ -23,10 +22,10 @@ export class AuthController {
         return await this.authService.login(credentialsDto);
     }
 
-  @Get('/me')
-  @UseGuards(AuthGuard())
-  getMe(@User() user: Profile): Profile {
-    return user;
-  }
+    @Get('/me')
+    @UseGuards(AuthGuard())
+    getMe(@User() user: Profile): Profile {
+      return user;
+    }
 
 }

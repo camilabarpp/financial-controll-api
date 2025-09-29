@@ -64,20 +64,11 @@ let UserService = class UserService {
         }
         try {
             const user = await this.createAndEncryptPassword(createUserDto, user_role_enum_1.UserRole.USER);
-            return {
-                id: user._id.toString(),
-                name: user.name,
-                email: user.email,
-                avatar: user.avatar || null,
-                role: user.role
-            };
+            return user;
         }
         catch (error) {
             throw new common_1.InternalServerErrorException(`Erro ao salvar usuário: ${error.message}`);
         }
-    }
-    async findByToken(token) {
-        return this.userModel.findOne({ token }).exec();
     }
     async findUserByEmail(email) {
         const user = await this.userModel.findOne({ email });
@@ -85,50 +76,52 @@ let UserService = class UserService {
             throw new common_1.NotFoundException('User not found');
         return user;
     }
-    async findUsers(query) {
-        const { email, name, status = true, role, page = 1, limit = 100, sort } = query;
-        const filter = { status };
-        if (email)
-            filter.email = new RegExp(`^${email}`, 'i');
-        if (name)
-            filter.name = new RegExp(`^${name}`, 'i');
-        if (role)
-            filter.role = role;
-        const skip = (page - 1) * limit;
-        const users = await this.userModel.find(filter)
-            .skip(skip)
-            .limit(Number(limit))
-            .sort(sort ? JSON.parse(sort) : {})
-            .select('name email role status')
-            .exec();
-        const total = await this.userModel.countDocuments(filter);
-        return { users, total };
-    }
-    async findUserById(id) {
-        const user = await this.userModel.findById(id).select('email name role id');
-        if (!user)
-            throw new common_1.NotFoundException('No user was found with the given ID: ' + id);
-        return user;
-    }
     async updateUser(updateUserDto, id) {
+        await this.findUserById(id);
         await this.userModel.updateOne({ _id: id }, updateUserDto);
-        try {
-            return await this.findUserById(id);
-        }
-        catch (error) {
-            throw new common_1.InternalServerErrorException('Error saving data to database');
-        }
+        const userUpdated = await this.findUserById(id);
+        return {
+            id: userUpdated._id.toString(),
+            email: userUpdated.email,
+            name: userUpdated.name,
+            avatar: userUpdated.avatar || null,
+            role: userUpdated.role
+        };
     }
     async deleteUser(id) {
         await this.findUserById(id);
         await this.userModel.deleteOne({ _id: id });
     }
-    async changePassword(id, password) {
-        const user = await this.userModel.findById(id);
+    async changePassword(id, body) {
+        const user = await this.findUserLogged(id);
+        const isPasswordMatch = await this.checkPassword(user, body.currentPassword);
+        if (!isPasswordMatch)
+            throw new common_1.ForbiddenException('Senha atual está incorreta');
         user.salt = await bcrypt.genSalt();
-        user.password = await bcrypt.hash(password, user.salt);
-        user.recoverToken = null;
+        user.password = await bcrypt.hash(body.newPassword, user.salt);
         await user.save();
+    }
+    async checkCredentials(credentialsDto) {
+        const { email, password } = credentialsDto;
+        const user = await this.userModel.findOne({ email, status: true });
+        if (user && (await this.checkPassword(user, password))) {
+            return user;
+        }
+        else {
+            throw new common_1.UnauthorizedException('Credenciais inválidas');
+        }
+    }
+    async findUserLogged(id) {
+        const user = await this.userModel.findById(id).select('email name role id salt password');
+        if (!user)
+            throw new common_1.UnauthorizedException('Usuário não encontrado');
+        return user;
+    }
+    async findUserById(id) {
+        const user = await this.userModel.findById(id).select('email avatar name role id');
+        if (!user)
+            throw new common_1.NotFoundException('Usuário não encontrado');
+        return user;
     }
     async generateHash(password) {
         const salt = await bcrypt.genSalt();
@@ -154,16 +147,6 @@ let UserService = class UserService {
         }
         catch (error) {
             throw new common_1.InternalServerErrorException(`Erro ao salvar usuário: ${error.message}`);
-        }
-    }
-    async checkCredentials(credentialsDto) {
-        const { email, password } = credentialsDto;
-        const user = await this.userModel.findOne({ email, status: true });
-        if (user && (await this.checkPassword(user, password))) {
-            return user;
-        }
-        else {
-            return null;
         }
     }
     async checkPassword(user, password) {

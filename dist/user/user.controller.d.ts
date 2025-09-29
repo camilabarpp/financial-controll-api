@@ -1,24 +1,13 @@
-import type { Request } from 'express';
 import { UserService } from './user.service';
+import { UpdateUserDto } from './type/user.update.request';
+import { UserResponseDTO } from './type/user.response';
 export declare class UserController {
     private readonly userService;
     constructor(userService: UserService);
-    findUsers(query: any): Promise<{
-        found: {
-            users: import("./type/user.schema").User[];
-            total: number;
-        };
-        message: string;
-    }>;
-    findUserById(id: string): Promise<{
-        user: import("./type/user.schema").User;
-        message: string;
-    }>;
-    updateUser(updateUserDto: any, req: Request, id: string): Promise<{
-        user: import("./type/user.schema").User;
-        message: string;
-    }>;
-    deleteUser(id: string, req: Request): Promise<{
-        message: string;
-    }>;
+    updateUser(updateUserDto: UpdateUserDto, id: string): Promise<UserResponseDTO>;
+    deleteUser(id: string): Promise<void>;
+    changePassword(id: string, body: {
+        currentPassword: string;
+        newPassword: string;
+    }): Promise<void>;
 }

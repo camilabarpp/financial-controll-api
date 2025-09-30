@@ -29,9 +29,20 @@ export class AuthService {
         const jwtPayload = {
         id: user.id,
         };
-       const token = "Bearer " + this.jwtService.sign(jwtPayload);
+       const token = this.jwtService.sign(jwtPayload);
 
        return { token };
+    }
+
+    async getMe(userId: string): Promise<UserResponseDTO> {
+        const user = await this.userService.findUserById(userId);
+        return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            avatar: user.avatar || null,
+            role: user.role
+        };
     }
 
     async resetPassword(email: string): Promise<void> {

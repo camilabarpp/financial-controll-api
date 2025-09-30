@@ -24,8 +24,7 @@ export class AuthController {
 
     @Get('/me')
     @UseGuards(AuthGuard())
-    getMe(@User() user: Profile): Profile {
-      return user;
+    async getMe(@User() user: Profile): Promise<UserResponseDTO> {
+      return await this.authService.getMe(user.id);
     }
-
 }

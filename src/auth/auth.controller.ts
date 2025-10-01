@@ -5,7 +5,7 @@ import { CreateUserDto } from 'src/user/type/user.create.request';
 import { UserResponseDTO } from 'src/user/type/user.response';
 import { UserCredentialsDto } from 'src/user/type/user.credential.request';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/common/decorator/get-user.decorator';
+import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User as Profile } from 'src/user/type/user.type';
 
 @Controller('auth')
@@ -24,7 +24,7 @@ export class AuthController {
 
     @Get('/me')
     @UseGuards(AuthGuard())
-    async getMe(@User() user: Profile): Promise<UserResponseDTO> {
+    async getMe(@GetUser() user: Profile): Promise<UserResponseDTO> {
       return await this.authService.getMe(user.id);
     }
 }

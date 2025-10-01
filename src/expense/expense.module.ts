@@ -12,7 +12,6 @@ import { PassportModule } from '@nestjs/passport';
     PassportModule.register({ defaultStrategy: 'jwt' })
   ],
   controllers: [ExpenseController],
-  providers: [ExpenseService],
-  exports: [ExpenseService]
+  providers: [ExpenseService]
 })
 export class ExpenseModule {}

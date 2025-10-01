@@ -4,7 +4,7 @@ import { ExpenseService } from './expense.service';
 import { PeriodType } from './period-type.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { User as UserProfile } from 'src/user/type/user.type';
-import { User } from 'src/common/decorator/get-user.decorator';
+import { GetUser } from 'src/common/decorator/get-user.decorator';
 
 @UseGuards(AuthGuard())
 @Controller('expenses')
@@ -14,7 +14,7 @@ export class ExpenseController {
 	@Get()
 	async getExpenses(
 		@Query('period') period: PeriodType = PeriodType.MONTH,
-		@User() user: UserProfile
+		@GetUser() user: UserProfile
 	) {
 		return this.expenseService.getExpensesByPeriod(user.id, period);
 	}

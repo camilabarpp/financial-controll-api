@@ -36,6 +36,10 @@ __decorate([
     __metadata("design:type", String)
 ], Transaction.prototype, "category", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ required: true, default: '#8A05BE' }),
+    __metadata("design:type", String)
+], Transaction.prototype, "categoryColor", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Date)
 ], Transaction.prototype, "date", void 0);

@@ -13,6 +13,7 @@ export class Transaction extends Document {
   @Prop({ required: true })
   category: string;
 
+  @Prop({ required: true, default: '#8A05BE' })
   categoryColor: string;
 
   @Prop({ required: true })

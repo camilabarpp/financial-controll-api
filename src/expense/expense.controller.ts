@@ -1,7 +1,7 @@
 
 import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
-import { PeriodType } from './period-type.enum';
+import { PeriodType } from '../transaction/type/period-type.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { User as UserProfile } from 'src/user/type/user.type';
 import { GetUser } from 'src/common/decorator/get-user.decorator';

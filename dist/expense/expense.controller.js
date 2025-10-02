@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExpenseController = void 0;
 const common_1 = require("@nestjs/common");
 const expense_service_1 = require("./expense.service");
-const period_type_enum_1 = require("./period-type.enum");
+const period_type_enum_1 = require("../transaction/type/period-type.enum");
 const passport_1 = require("@nestjs/passport");
 const user_type_1 = require("../user/type/user.type");
 const get_user_decorator_1 = require("../common/decorator/get-user.decorator");

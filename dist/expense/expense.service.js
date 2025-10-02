@@ -20,7 +20,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const expense_schema_1 = require("./expense.schema");
-const period_type_enum_1 = require("./period-type.enum");
+const period_type_enum_1 = require("../transaction/type/period-type.enum");
 const moment_1 = __importDefault(require("moment"));
 let ExpenseService = class ExpenseService {
     transactionModel;

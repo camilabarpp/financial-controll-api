@@ -51,7 +51,7 @@ let TransactionService = class TransactionService {
         const endDate = this.getEndDate(period);
         const transactions = await this.transactionModel.find({
             user: userId,
-            date: { $gte: startDate, $lt: endDate }
+            date: { $gte: startDate, $lte: endDate }
         }).exec();
         const income = transactions.filter(tx => tx.type === transaction_type_enum_1.TransactionType.INCOME).reduce((acc, tx) => acc + tx.amount, 0);
         const expense = transactions.filter(tx => tx.type === transaction_type_enum_1.TransactionType.EXPENSE).reduce((acc, tx) => acc + tx.amount, 0);
@@ -60,7 +60,7 @@ let TransactionService = class TransactionService {
     async getTransactionsBalance(userId) {
         const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
-        const transactions = await this.transactionModel.find({ user: userId, date: { $gte: startOfMonth, $lt: endOfMonth } });
+        const transactions = await this.transactionModel.find({ user: userId, date: { $gte: startOfMonth, $lte: endOfMonth } });
         const income = transactions.filter(tx => tx.type === transaction_type_enum_1.TransactionType.INCOME).reduce((acc, tx) => acc + tx.amount, 0);
         const expense = transactions.filter(tx => tx.type === transaction_type_enum_1.TransactionType.EXPENSE).reduce((acc, tx) => acc + tx.amount, 0);
         const avaliable = income - expense;
@@ -94,6 +94,14 @@ let TransactionService = class TransactionService {
     async deleteTransaction(id, userId) {
         await this.transactionModel.deleteOne({ _id: id, user: userId }).exec();
     }
+    async getTransactionsCategories(userId, search) {
+        const filter = { user: userId };
+        if (search && search.trim()) {
+            filter.category = { $regex: this.escapeRegex(search.trim()), $options: 'i' };
+        }
+        const categories = await this.transactionModel.distinct('category', filter).exec();
+        return categories;
+    }
     async getTransactionsResponse(transaction) {
         return {
             id: transaction._id.toString(),
@@ -108,13 +116,14 @@ let TransactionService = class TransactionService {
     async getStartDate(period) {
         const now = new Date();
         switch (period) {
+            case period_type_enum_1.PeriodType.MONTH: {
+                const firstDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+                return firstDay;
+            }
             case period_type_enum_1.PeriodType.WEEK: {
                 const weekAgo = new Date(now);
                 weekAgo.setDate(now.getDate() - 8);
                 return weekAgo;
-            }
-            case period_type_enum_1.PeriodType.MONTH: {
-                return new Date(now.getFullYear(), now.getMonth(), 1);
             }
             case period_type_enum_1.PeriodType.QUARTER: {
                 const quarterAgo = new Date(now);
@@ -127,13 +136,14 @@ let TransactionService = class TransactionService {
                 return new Date(yearAgo.getFullYear(), 0, 1);
             }
             default:
-                return new Date(now.getFullYear(), now.getMonth(), 1);
+                const firstDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+                return firstDay;
         }
     }
     buildQuery(userId, startDate, endDate, search, transactionType) {
         const query = {
             user: userId,
-            date: { $gte: startDate, $lt: endDate }
+            date: { $gte: startDate, $lte: endDate }
         };
         if (search?.trim()) {
             const sanitized = this.escapeRegex(search.trim());
@@ -168,10 +178,33 @@ let TransactionService = class TransactionService {
     getEndDate(period) {
         const now = new Date();
         switch (period) {
-            case period_type_enum_1.PeriodType.MONTH:
-                return new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            case period_type_enum_1.PeriodType.MONTH: {
+                const lastDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
+                return lastDay;
+            }
+            case period_type_enum_1.PeriodType.WEEK: {
+                const dayOfWeek = now.getDay();
+                const daysUntilEndOfWeek = 6 - dayOfWeek;
+                const weekEnd = new Date(now);
+                weekEnd.setDate(now.getDate() + daysUntilEndOfWeek);
+                weekEnd.setHours(23, 59, 59, 999);
+                return weekEnd;
+            }
+            case period_type_enum_1.PeriodType.QUARTER: {
+                const currentMonth = now.getMonth();
+                const quarterEndMonth = currentMonth - (currentMonth % 3) + 2;
+                const quarterEnd = new Date(now.getFullYear(), quarterEndMonth + 1, 0);
+                quarterEnd.setHours(23, 59, 59, 999);
+                return quarterEnd;
+            }
+            case period_type_enum_1.PeriodType.YEAR: {
+                const yearEnd = new Date(now.getFullYear(), 11, 31);
+                yearEnd.setHours(23, 59, 59, 999);
+                return yearEnd;
+            }
             default:
-                return new Date();
+                const lastDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
+                return lastDay;
         }
     }
     async getTotalAmount(query, type) {

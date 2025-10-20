@@ -47,6 +47,9 @@ let TransactionController = class TransactionController {
         await this.transactionService.deleteTransaction(id, user.id);
         return { success: true };
     }
+    async getTransactionsCategories(user, search) {
+        return this.transactionService.getTransactionsCategories(user.id, search);
+    }
 };
 exports.TransactionController = TransactionController;
 __decorate([
@@ -111,6 +114,14 @@ __decorate([
     __metadata("design:paramtypes", [user_type_1.User, String]),
     __metadata("design:returntype", Promise)
 ], TransactionController.prototype, "deleteTransaction", null);
+__decorate([
+    (0, common_1.Get)('categories'),
+    __param(0, (0, get_user_decorator_1.GetUser)()),
+    __param(1, (0, common_1.Query)('search')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_type_1.User, String]),
+    __metadata("design:returntype", Promise)
+], TransactionController.prototype, "getTransactionsCategories", null);
 exports.TransactionController = TransactionController = __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)()),
     (0, common_1.Controller)('transactions'),

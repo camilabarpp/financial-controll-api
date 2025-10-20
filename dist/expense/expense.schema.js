@@ -55,4 +55,5 @@ exports.Transaction = Transaction = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Transaction);
 exports.TransactionSchema = mongoose_1.SchemaFactory.createForClass(Transaction);
+exports.TransactionSchema.index({ user: 1, category: 1 });
 //# sourceMappingURL=expense.schema.js.map

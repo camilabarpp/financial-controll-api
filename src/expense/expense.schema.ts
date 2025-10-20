@@ -27,3 +27,4 @@ export class Transaction extends Document {
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
+TransactionSchema.index({ user: 1, category: 1 });

@@ -24,6 +24,7 @@ export declare class TransactionService {
     createTransaction(userId: string, data: TransactionRequest): Promise<TransactionResponse>;
     updateTransaction(id: string, userId: string, data: Partial<TransactionRequest>): Promise<TransactionResponse>;
     deleteTransaction(id: string, userId: string): Promise<void>;
+    getTransactionsCategories(userId: string, search?: string): Promise<string[]>;
     private getTransactionsResponse;
     private getStartDate;
     private buildQuery;

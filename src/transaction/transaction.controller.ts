@@ -66,4 +66,9 @@ export class TransactionController {
         await this.transactionService.deleteTransaction(id, user.id);
         return { success: true };
     }
+
+    @Get('categories')
+    async getTransactionsCategories(@GetUser() user: User, @Query('search') search: string) {
+        return this.transactionService.getTransactionsCategories(user.id, search);
+    }
 }

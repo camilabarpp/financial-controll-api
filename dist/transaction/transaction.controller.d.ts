@@ -25,4 +25,5 @@ export declare class TransactionController {
     deleteTransaction(user: User, id: string): Promise<{
         success: boolean;
     }>;
+    getTransactionsCategories(user: User, search: string): Promise<string[]>;
 }

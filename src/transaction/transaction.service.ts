@@ -131,9 +131,10 @@ export class TransactionService {
     }
 
     async getTransactionsCategories(userId: string, search?: string): Promise<string[]> {
+        const sanitizedSearch = search?.trim().toUpperCase();
         const filter: any = { user: userId };
-        if (search && search.trim()) {
-            filter.category = { $regex: this.escapeRegex(search.trim()), $options: 'i' };
+        if (sanitizedSearch) {
+            filter.category = { $regex: this.escapeRegex(sanitizedSearch), $options: 'i' };
         }
         const categories = await this.transactionModel.distinct('category', filter).exec();
         return categories;

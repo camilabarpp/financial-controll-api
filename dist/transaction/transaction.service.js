@@ -95,9 +95,10 @@ let TransactionService = class TransactionService {
         await this.transactionModel.deleteOne({ _id: id, user: userId }).exec();
     }
     async getTransactionsCategories(userId, search) {
+        const sanitizedSearch = search?.trim().toUpperCase();
         const filter = { user: userId };
-        if (search && search.trim()) {
-            filter.category = { $regex: this.escapeRegex(search.trim()), $options: 'i' };
+        if (sanitizedSearch) {
+            filter.category = { $regex: this.escapeRegex(sanitizedSearch), $options: 'i' };
         }
         const categories = await this.transactionModel.distinct('category', filter).exec();
         return categories;

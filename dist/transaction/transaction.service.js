@@ -31,45 +31,68 @@ let TransactionService = class TransactionService {
         const sortObj = this.buildSort(sort);
         const skip = (currentPage - 1) * limit;
         const [transactions, total, income, expense] = await Promise.all([
-            this.transactionModel.find(query).sort(sortObj).skip(skip).limit(limit).exec(),
+            this.transactionModel
+                .find(query)
+                .sort(sortObj)
+                .skip(skip)
+                .limit(limit)
+                .exec(),
             this.transactionModel.countDocuments(query),
             this.getTotalAmount(query, transaction_type_enum_1.TransactionType.INCOME),
-            this.getTotalAmount(query, transaction_type_enum_1.TransactionType.EXPENSE)
+            this.getTotalAmount(query, transaction_type_enum_1.TransactionType.EXPENSE),
         ]);
-        const transactionsResponse = await Promise.all(transactions.map(tx => this.getTransactionsResponse(tx)));
+        const transactionsResponse = await Promise.all(transactions.map((tx) => this.getTransactionsResponse(tx)));
         return {
             transactions: transactionsResponse,
             transactionIncome: income,
             transactionExpense: expense,
             total,
             totalPages: Math.ceil(total / limit),
-            currentPage: Number(currentPage)
+            currentPage: Number(currentPage),
         };
     }
     async getTransactionsTotals(userId, period) {
         const startDate = await this.getStartDate(period);
         const endDate = this.getEndDate(period);
-        const transactions = await this.transactionModel.find({
+        const transactions = await this.transactionModel
+            .find({
             user: userId,
-            date: { $gte: startDate, $lte: endDate }
-        }).exec();
-        const income = transactions.filter(tx => tx.type === transaction_type_enum_1.TransactionType.INCOME).reduce((acc, tx) => acc + tx.amount, 0);
-        const expense = transactions.filter(tx => tx.type === transaction_type_enum_1.TransactionType.EXPENSE).reduce((acc, tx) => acc + tx.amount, 0);
+            date: { $gte: startDate, $lte: endDate },
+        })
+            .exec();
+        const income = transactions
+            .filter((tx) => tx.type === transaction_type_enum_1.TransactionType.INCOME)
+            .reduce((acc, tx) => acc + tx.amount, 0);
+        const expense = transactions
+            .filter((tx) => tx.type === transaction_type_enum_1.TransactionType.EXPENSE)
+            .reduce((acc, tx) => acc + tx.amount, 0);
         return { income, expense };
     }
     async getTransactionsBalance(userId) {
-        const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-        const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
-        const transactions = await this.transactionModel.find({ user: userId, date: { $gte: startOfMonth, $lte: endOfMonth } });
-        const income = transactions.filter(tx => tx.type === transaction_type_enum_1.TransactionType.INCOME).reduce((acc, tx) => acc + tx.amount, 0);
-        const expense = transactions.filter(tx => tx.type === transaction_type_enum_1.TransactionType.EXPENSE).reduce((acc, tx) => acc + tx.amount, 0);
+        const now = new Date();
+        const startOfMonth = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0));
+        const endOfMonth = new Date(Date.UTC(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0));
+        const transactions = await this.transactionModel.find({
+            user: userId,
+            date: { $gte: startOfMonth, $lte: endOfMonth },
+        });
+        const income = transactions
+            .filter((tx) => tx.type === transaction_type_enum_1.TransactionType.INCOME)
+            .reduce((acc, tx) => acc + tx.amount, 0);
+        const expense = transactions
+            .filter((tx) => tx.type === transaction_type_enum_1.TransactionType.EXPENSE)
+            .reduce((acc, tx) => acc + tx.amount, 0);
         const avaliable = income - expense;
         const saved = 0;
         return { avaliable, income, expense, saved };
     }
     async getRecentTransactions(userId) {
-        const transactions = await this.transactionModel.find({ user: userId }).sort({ date: -1 }).limit(5).exec();
-        return await Promise.all(transactions.map(tx => this.getTransactionsResponse(tx)));
+        const transactions = await this.transactionModel
+            .find({ user: userId })
+            .sort({ date: -1 })
+            .limit(5)
+            .exec();
+        return await Promise.all(transactions.map((tx) => this.getTransactionsResponse(tx)));
     }
     async createTransaction(userId, data) {
         const transaction = new this.transactionModel({
@@ -85,9 +108,11 @@ let TransactionService = class TransactionService {
         if (updateData.date) {
             updateData.date = new Date(updateData.date);
         }
-        const updatedTransaction = await this.transactionModel.findOneAndUpdate({ _id: id, user: userId }, updateData, { new: true }).exec();
+        const updatedTransaction = await this.transactionModel
+            .findOneAndUpdate({ _id: id, user: userId }, updateData, { new: true })
+            .exec();
         if (!updatedTransaction) {
-            throw new Error('Transaction not found');
+            throw new Error("Transaction not found");
         }
         return await this.getTransactionsResponse(updatedTransaction);
     }
@@ -98,9 +123,14 @@ let TransactionService = class TransactionService {
         const sanitizedSearch = search?.trim().toUpperCase();
         const filter = { user: userId };
         if (sanitizedSearch) {
-            filter.category = { $regex: this.escapeRegex(sanitizedSearch), $options: 'i' };
+            filter.category = {
+                $regex: this.escapeRegex(sanitizedSearch),
+                $options: "i",
+            };
         }
-        const categories = await this.transactionModel.distinct('category', filter).exec();
+        const categories = await this.transactionModel
+            .distinct("category", filter)
+            .exec();
         return categories;
     }
     async getTransactionsResponse(transaction) {
@@ -111,7 +141,7 @@ let TransactionService = class TransactionService {
             category: transaction.category,
             categoryColor: transaction.categoryColor,
             date: transaction.date,
-            type: transaction.type
+            type: transaction.type,
         };
     }
     async getStartDate(period) {
@@ -144,16 +174,16 @@ let TransactionService = class TransactionService {
     buildQuery(userId, startDate, endDate, search, transactionType) {
         const query = {
             user: userId,
-            date: { $gte: startDate, $lte: endDate }
+            date: { $gte: startDate, $lte: endDate },
         };
         if (search?.trim()) {
             const sanitized = this.escapeRegex(search.trim());
             query.$or = [
-                { description: { $regex: sanitized, $options: 'i' } },
-                { category: { $regex: sanitized, $options: 'i' } }
+                { description: { $regex: sanitized, $options: "i" } },
+                { category: { $regex: sanitized, $options: "i" } },
             ];
         }
-        if (transactionType === 'ALL') {
+        if (transactionType === "ALL") {
             query.type = { $in: [transaction_type_enum_1.TransactionType.INCOME, transaction_type_enum_1.TransactionType.EXPENSE] };
         }
         else if (transactionType) {
@@ -162,17 +192,17 @@ let TransactionService = class TransactionService {
         return query;
     }
     buildSort(sort) {
-        if (sort === 'ASC' || sort === 'DESC') {
+        if (sort === "ASC" || sort === "DESC") {
             return {
-                amount: sort === 'ASC' ? 1 : -1,
+                amount: sort === "ASC" ? 1 : -1,
                 date: -1,
-                _id: -1
+                _id: -1,
             };
         }
         else {
             return {
                 date: -1,
-                _id: -1
+                _id: -1,
             };
         }
     }
@@ -212,12 +242,12 @@ let TransactionService = class TransactionService {
         const match = { ...query, type };
         const result = await this.transactionModel.aggregate([
             { $match: match },
-            { $group: { _id: null, total: { $sum: "$amount" } } }
+            { $group: { _id: null, total: { $sum: "$amount" } } },
         ]);
         return result[0]?.total ?? 0;
     }
     escapeRegex(text) {
-        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 };
 exports.TransactionService = TransactionService;

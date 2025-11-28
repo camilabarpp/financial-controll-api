@@ -75,7 +75,6 @@ export class ExpenseService {
         }).lean();
     }
 
-
     private groupByMonth(expenses: any[], now: moment.Moment, months: number) {
         const result = [];
         for (let i = 0; i < months; i++) {

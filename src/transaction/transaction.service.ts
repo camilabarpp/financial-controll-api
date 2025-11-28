@@ -175,18 +175,24 @@ export class TransactionService {
     userId: string,
     search?: string
   ): Promise<string[]> {
-    const sanitizedSearch = search?.trim().toUpperCase();
     const filter: any = { user: userId };
-    if (sanitizedSearch) {
-      filter.category = {
-        $regex: this.escapeRegex(sanitizedSearch),
-        $options: "i",
-      };
+
+    if (search?.trim()) {
+      const sanitized = this.escapeRegex(search.trim());
+      filter.category = { $regex: sanitized, $options: "i" };
     }
-    const categories = await this.transactionModel
-      .distinct("category", filter)
+
+    const result = await this.transactionModel
+      .aggregate([
+        { $match: filter },
+        { $group: { _id: "$category" } },       
+        { $sort: { _id: 1 } },                 
+        { $limit: 5 },                         
+        { $project: { _id: 0, category: "$_id" } },
+      ])
       .exec();
-    return categories;
+
+    return result.map((r) => r.category);
   }
 
   private async getTransactionsResponse(

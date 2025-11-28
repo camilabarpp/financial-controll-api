@@ -120,18 +120,21 @@ let TransactionService = class TransactionService {
         await this.transactionModel.deleteOne({ _id: id, user: userId }).exec();
     }
     async getTransactionsCategories(userId, search) {
-        const sanitizedSearch = search?.trim().toUpperCase();
         const filter = { user: userId };
-        if (sanitizedSearch) {
-            filter.category = {
-                $regex: this.escapeRegex(sanitizedSearch),
-                $options: "i",
-            };
+        if (search?.trim()) {
+            const sanitized = this.escapeRegex(search.trim());
+            filter.category = { $regex: sanitized, $options: "i" };
         }
-        const categories = await this.transactionModel
-            .distinct("category", filter)
+        const result = await this.transactionModel
+            .aggregate([
+            { $match: filter },
+            { $group: { _id: "$category" } },
+            { $sort: { _id: 1 } },
+            { $limit: 5 },
+            { $project: { _id: 0, category: "$_id" } },
+        ])
             .exec();
-        return categories;
+        return result.map((r) => r.category);
     }
     async getTransactionsResponse(transaction) {
         return {

@@ -26,10 +26,8 @@ export declare class TransactionService {
     deleteTransaction(id: string, userId: string): Promise<void>;
     getTransactionsCategories(userId: string, search?: string): Promise<string[]>;
     private getTransactionsResponse;
-    private getStartDate;
     private buildQuery;
     private buildSort;
-    private getEndDate;
     private getTotalAmount;
     private escapeRegex;
 }

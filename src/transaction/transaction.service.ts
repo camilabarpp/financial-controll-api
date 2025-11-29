@@ -7,6 +7,7 @@ import { TransactionType } from "./type/transaction.type.enum";
 import { TransactionResponse } from "./type/transaction.response";
 import { PeriodType } from "src/transaction/type/period-type.enum";
 import { TransactionRequest } from "./type/transaction.request";
+import { getStartDate, getEndDate } from "src/common/utils/data-utils";
 
 @Injectable()
 export class TransactionService {
@@ -30,8 +31,8 @@ export class TransactionService {
     totalPages: number;
     currentPage: number;
   }> {
-    const startDate = await this.getStartDate(period);
-    const endDate = this.getEndDate(period);
+    const startDate = await getStartDate(period);
+    const endDate = getEndDate(period);
 
     const query = this.buildQuery(
       userId,
@@ -73,8 +74,8 @@ export class TransactionService {
     userId: string,
     period: PeriodType
   ): Promise<{ income: number; expense: number }> {
-    const startDate = await this.getStartDate(period);
-    const endDate = this.getEndDate(period);
+    const startDate = await getStartDate(period);
+    const endDate = getEndDate(period);
 
     const transactions = await this.transactionModel
       .find({
@@ -209,38 +210,6 @@ export class TransactionService {
     };
   }
 
-  private async getStartDate(period: PeriodType): Promise<Date> {
-    const now = new Date();
-    switch (period) {
-      case PeriodType.MONTH: {
-        const firstDay = new Date(
-          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
-        );
-        return firstDay;
-      }
-      case PeriodType.WEEK: {
-        const weekAgo = new Date(now);
-        weekAgo.setDate(now.getDate() - 8);
-        return weekAgo;
-      }
-      case PeriodType.QUARTER: {
-        const quarterAgo = new Date(now);
-        quarterAgo.setMonth(now.getMonth() - 3);
-        return quarterAgo;
-      }
-      case PeriodType.YEAR: {
-        const yearAgo = new Date(now);
-        yearAgo.setFullYear(now.getFullYear() - 1);
-        return new Date(yearAgo.getFullYear(), 0, 1);
-      }
-      default:
-        const firstDay = new Date(
-          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
-        );
-        return firstDay;
-    }
-  }
-
   private buildQuery(
     userId: string,
     startDate: Date,
@@ -287,60 +256,7 @@ export class TransactionService {
     }
   }
 
-  private getEndDate(period: PeriodType): Date {
-    const now = new Date();
-    switch (period) {
-      case PeriodType.MONTH: {
-        const lastDay = new Date(
-          Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth() + 1,
-            0,
-            23,
-            59,
-            59,
-            999
-          )
-        );
-        return lastDay;
-      }
-      case PeriodType.WEEK: {
-        const dayOfWeek = now.getDay();
-        const daysUntilEndOfWeek = 6 - dayOfWeek;
-        const weekEnd = new Date(now);
-        weekEnd.setDate(now.getDate() + daysUntilEndOfWeek);
-        weekEnd.setHours(23, 59, 59, 999);
-        return weekEnd;
-      }
-      case PeriodType.QUARTER: {
-        const currentMonth = now.getMonth();
-        const quarterEndMonth = currentMonth - (currentMonth % 3) + 2;
-        const quarterEnd = new Date(now.getFullYear(), quarterEndMonth + 1, 0);
-        quarterEnd.setHours(23, 59, 59, 999);
-        return quarterEnd;
-      }
-      case PeriodType.YEAR: {
-        const yearEnd = new Date(now.getFullYear(), 11, 31);
-        yearEnd.setHours(23, 59, 59, 999);
-        return yearEnd;
-      }
-      default:
-        const lastDay = new Date(
-          Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth() + 1,
-            0,
-            23,
-            59,
-            59,
-            999
-          )
-        );
-        return lastDay;
-    }
-  }
-
-  private async getTotalAmount(
+   private async getTotalAmount(
     query: Record<string, any>,
     type: TransactionType
   ): Promise<number> {

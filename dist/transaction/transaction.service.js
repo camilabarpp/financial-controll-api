@@ -18,15 +18,15 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const expense_schema_1 = require("../expense/expense.schema");
 const transaction_type_enum_1 = require("./type/transaction.type.enum");
-const period_type_enum_1 = require("./type/period-type.enum");
+const data_utils_1 = require("../common/utils/data-utils");
 let TransactionService = class TransactionService {
     transactionModel;
     constructor(transactionModel) {
         this.transactionModel = transactionModel;
     }
     async getTransactions(userId, period, search, sort, transactionType, currentPage = 1, limit = 10) {
-        const startDate = await this.getStartDate(period);
-        const endDate = this.getEndDate(period);
+        const startDate = await (0, data_utils_1.getStartDate)(period);
+        const endDate = (0, data_utils_1.getEndDate)(period);
         const query = this.buildQuery(userId, startDate, endDate, search, transactionType);
         const sortObj = this.buildSort(sort);
         const skip = (currentPage - 1) * limit;
@@ -52,8 +52,8 @@ let TransactionService = class TransactionService {
         };
     }
     async getTransactionsTotals(userId, period) {
-        const startDate = await this.getStartDate(period);
-        const endDate = this.getEndDate(period);
+        const startDate = await (0, data_utils_1.getStartDate)(period);
+        const endDate = (0, data_utils_1.getEndDate)(period);
         const transactions = await this.transactionModel
             .find({
             user: userId,
@@ -147,33 +147,6 @@ let TransactionService = class TransactionService {
             type: transaction.type,
         };
     }
-    async getStartDate(period) {
-        const now = new Date();
-        switch (period) {
-            case period_type_enum_1.PeriodType.MONTH: {
-                const firstDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
-                return firstDay;
-            }
-            case period_type_enum_1.PeriodType.WEEK: {
-                const weekAgo = new Date(now);
-                weekAgo.setDate(now.getDate() - 8);
-                return weekAgo;
-            }
-            case period_type_enum_1.PeriodType.QUARTER: {
-                const quarterAgo = new Date(now);
-                quarterAgo.setMonth(now.getMonth() - 3);
-                return quarterAgo;
-            }
-            case period_type_enum_1.PeriodType.YEAR: {
-                const yearAgo = new Date(now);
-                yearAgo.setFullYear(now.getFullYear() - 1);
-                return new Date(yearAgo.getFullYear(), 0, 1);
-            }
-            default:
-                const firstDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
-                return firstDay;
-        }
-    }
     buildQuery(userId, startDate, endDate, search, transactionType) {
         const query = {
             user: userId,
@@ -207,38 +180,6 @@ let TransactionService = class TransactionService {
                 date: -1,
                 _id: -1,
             };
-        }
-    }
-    getEndDate(period) {
-        const now = new Date();
-        switch (period) {
-            case period_type_enum_1.PeriodType.MONTH: {
-                const lastDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
-                return lastDay;
-            }
-            case period_type_enum_1.PeriodType.WEEK: {
-                const dayOfWeek = now.getDay();
-                const daysUntilEndOfWeek = 6 - dayOfWeek;
-                const weekEnd = new Date(now);
-                weekEnd.setDate(now.getDate() + daysUntilEndOfWeek);
-                weekEnd.setHours(23, 59, 59, 999);
-                return weekEnd;
-            }
-            case period_type_enum_1.PeriodType.QUARTER: {
-                const currentMonth = now.getMonth();
-                const quarterEndMonth = currentMonth - (currentMonth % 3) + 2;
-                const quarterEnd = new Date(now.getFullYear(), quarterEndMonth + 1, 0);
-                quarterEnd.setHours(23, 59, 59, 999);
-                return quarterEnd;
-            }
-            case period_type_enum_1.PeriodType.YEAR: {
-                const yearEnd = new Date(now.getFullYear(), 11, 31);
-                yearEnd.setHours(23, 59, 59, 999);
-                return yearEnd;
-            }
-            default:
-                const lastDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
-                return lastDay;
         }
     }
     async getTotalAmount(query, type) {

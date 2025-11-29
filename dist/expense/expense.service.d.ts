@@ -5,7 +5,10 @@ export declare class ExpenseService {
     private transactionModel;
     constructor(transactionModel: Model<Transaction>);
     getExpensesByPeriod(userId: string, period?: PeriodType): Promise<{
-        groupedExpenses: any[];
+        lastSixMonthsExpenses: {
+            month: string;
+            expenses: number;
+        }[];
         expenseCategory: {
             category: string;
             expenses: number;
@@ -14,10 +17,7 @@ export declare class ExpenseService {
         totalExpenses: number;
         categoriesCount: number;
     }>;
-    private getPeriodConfig;
     private findExpenses;
     private groupByMonth;
-    private groupByDay;
-    getExpensesByMonth(userId: string): Promise<any[]>;
     private getExpensesByCategorySync;
 }

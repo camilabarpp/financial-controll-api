@@ -5,7 +5,10 @@ export declare class ExpenseController {
     private readonly expenseService;
     constructor(expenseService: ExpenseService);
     getExpenses(period: PeriodType, user: UserProfile): Promise<{
-        groupedExpenses: any[];
+        lastSixMonthsExpenses: {
+            month: string;
+            expenses: number;
+        }[];
         expenseCategory: {
             category: string;
             expenses: number;

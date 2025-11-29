@@ -33,7 +33,7 @@ let ExpenseService = class ExpenseService {
         const actualMonthExpenses = await this.findExpenses(userId, period_type_enum_1.PeriodType.MONTH);
         const expenseCategory = this.getExpensesByCategorySync(expensesByPeriod);
         const totalExpenses = actualMonthExpenses.reduce((sum, g) => sum + g.amount, 0);
-        const lastSixMonthsExpenses = this.groupByMonth(expensesByPeriod);
+        const lastSixMonthsExpenses = this.groupByMonth(await this.findExpenses(userId, period_type_enum_1.PeriodType.YEAR));
         return {
             lastSixMonthsExpenses,
             expenseCategory,

@@ -6,6 +6,7 @@ import { User } from 'src/user/type/user.type';
 import { PeriodType } from 'src/transaction/type/period-type.enum';
 import { TransactionRequest } from './type/transaction.request';
 import { TransactionResponse } from './type/transaction.response';
+import { TransactionCategory } from './type/transaction.category';
 
 @UseGuards(AuthGuard())
 @Controller('transactions')
@@ -68,7 +69,7 @@ export class TransactionController {
     }
 
     @Get('categories')
-    async getTransactionsCategories(@GetUser() user: User, @Query('search') search: string) {
-        return this.transactionService.getTransactionsCategories(user.id, search);
+    async getTransactionsCategories(@GetUser() user: User, @Query('search') search: string): Promise<TransactionCategory[]> {
+        return await this.transactionService.getTransactionsCategories(user.id, search);
     }
 }

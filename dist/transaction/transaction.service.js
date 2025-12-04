@@ -128,13 +128,13 @@ let TransactionService = class TransactionService {
         const result = await this.transactionModel
             .aggregate([
             { $match: filter },
-            { $group: { _id: "$category" } },
+            { $group: { _id: "$category", categoryColor: { $first: "$categoryColor" } } },
             { $sort: { _id: 1 } },
             { $limit: 5 },
-            { $project: { _id: 0, category: "$_id" } },
+            { $project: { _id: 0, category: "$_id", categoryColor: "$categoryColor" } },
         ])
             .exec();
-        return result.map((r) => r.category);
+        return result;
     }
     async getTransactionsResponse(transaction) {
         return {

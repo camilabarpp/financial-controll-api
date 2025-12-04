@@ -4,6 +4,7 @@ import { TransactionBalanceResponse } from "./type/transaction.balance.response"
 import { TransactionResponse } from "./type/transaction.response";
 import { PeriodType } from "src/transaction/type/period-type.enum";
 import { TransactionRequest } from "./type/transaction.request";
+import { TransactionCategory } from "./type/transaction.category";
 export declare class TransactionService {
     private transactionModel;
     constructor(transactionModel: Model<Transaction>);
@@ -24,7 +25,7 @@ export declare class TransactionService {
     createTransaction(userId: string, data: TransactionRequest): Promise<TransactionResponse>;
     updateTransaction(id: string, userId: string, data: Partial<TransactionRequest>): Promise<TransactionResponse>;
     deleteTransaction(id: string, userId: string): Promise<void>;
-    getTransactionsCategories(userId: string, search?: string): Promise<string[]>;
+    getTransactionsCategories(userId: string, search?: string): Promise<TransactionCategory[]>;
     private getTransactionsResponse;
     private buildQuery;
     private buildSort;

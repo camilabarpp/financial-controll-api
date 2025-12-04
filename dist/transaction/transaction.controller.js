@@ -48,7 +48,7 @@ let TransactionController = class TransactionController {
         return { success: true };
     }
     async getTransactionsCategories(user, search) {
-        return this.transactionService.getTransactionsCategories(user.id, search);
+        return await this.transactionService.getTransactionsCategories(user.id, search);
     }
 };
 exports.TransactionController = TransactionController;

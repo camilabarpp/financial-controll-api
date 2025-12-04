@@ -8,6 +8,7 @@ import { TransactionResponse } from "./type/transaction.response";
 import { PeriodType } from "src/transaction/type/period-type.enum";
 import { TransactionRequest } from "./type/transaction.request";
 import { getStartDate, getEndDate } from "src/common/utils/data-utils";
+import { TransactionCategory } from "./type/transaction.category";
 
 @Injectable()
 export class TransactionService {
@@ -175,7 +176,7 @@ export class TransactionService {
   async getTransactionsCategories(
     userId: string,
     search?: string
-  ): Promise<string[]> {
+  ): Promise<TransactionCategory[]> {
     const filter: any = { user: userId };
 
     if (search?.trim()) {
@@ -186,14 +187,14 @@ export class TransactionService {
     const result = await this.transactionModel
       .aggregate([
         { $match: filter },
-        { $group: { _id: "$category" } },       
+        { $group: { _id: "$category", categoryColor: { $first: "$categoryColor" } } },       
         { $sort: { _id: 1 } },                 
         { $limit: 5 },                         
-        { $project: { _id: 0, category: "$_id" } },
+        { $project: { _id: 0, category: "$_id", categoryColor: "$categoryColor" } },
       ])
       .exec();
 
-    return result.map((r) => r.category);
+    return result;
   }
 
   private async getTransactionsResponse(

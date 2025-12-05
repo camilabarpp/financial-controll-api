@@ -12,14 +12,14 @@ const transaction_controller_1 = require("./transaction.controller");
 const transaction_service_1 = require("./transaction.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const passport_1 = require("@nestjs/passport");
-const expense_schema_1 = require("../expense/expense.schema");
+const transaction_schema_1 = require("./type/transaction.schema");
 let TransactionModule = class TransactionModule {
 };
 exports.TransactionModule = TransactionModule;
 exports.TransactionModule = TransactionModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: expense_schema_1.Transaction.name, schema: expense_schema_1.TransactionSchema }]),
+            mongoose_1.MongooseModule.forFeature([{ name: transaction_schema_1.Transaction.name, schema: transaction_schema_1.TransactionSchema }]),
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' })
         ],
         controllers: [transaction_controller_1.TransactionController],

@@ -11,7 +11,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const expense_controller_1 = require("./expense.controller");
 const expense_service_1 = require("./expense.service");
-const expense_schema_1 = require("./expense.schema");
+const transaction_schema_1 = require("../transaction/type/transaction.schema");
 const passport_1 = require("@nestjs/passport");
 let ExpenseModule = class ExpenseModule {
 };
@@ -19,7 +19,7 @@ exports.ExpenseModule = ExpenseModule;
 exports.ExpenseModule = ExpenseModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: expense_schema_1.Transaction.name, schema: expense_schema_1.TransactionSchema }]),
+            mongoose_1.MongooseModule.forFeature([{ name: transaction_schema_1.Transaction.name, schema: transaction_schema_1.TransactionSchema }]),
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' })
         ],
         controllers: [expense_controller_1.ExpenseController],

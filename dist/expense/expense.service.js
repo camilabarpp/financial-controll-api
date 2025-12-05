@@ -19,7 +19,7 @@ exports.ExpenseService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const expense_schema_1 = require("./expense.schema");
+const transaction_schema_1 = require("../transaction/type/transaction.schema");
 const period_type_enum_1 = require("../transaction/type/period-type.enum");
 const moment_1 = __importDefault(require("moment"));
 const data_utils_1 = require("../common/utils/data-utils");
@@ -54,7 +54,6 @@ let ExpenseService = class ExpenseService {
         const result = [];
         const months = 6;
         const now = (0, moment_1.default)();
-        console.log('Grouping by month for', months, 'months');
         for (let i = 0; i < months; i++) {
             const month = now.clone().subtract(i, 'months');
             const monthAbbr = month.format('MMM').toUpperCase();
@@ -103,7 +102,7 @@ let ExpenseService = class ExpenseService {
 exports.ExpenseService = ExpenseService;
 exports.ExpenseService = ExpenseService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(expense_schema_1.Transaction.name)),
+    __param(0, (0, mongoose_1.InjectModel)(transaction_schema_1.Transaction.name)),
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], ExpenseService);
 //# sourceMappingURL=expense.service.js.map

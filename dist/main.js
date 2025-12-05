@@ -36,8 +36,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const bodyParser = __importStar(require("body-parser"));
+const exception_filter_1 = require("./common/filters/exception.filter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.useGlobalFilters(new exception_filter_1.AllExceptionsFilter());
     app.enableCors({
         origin: [
             'http://localhost:3001',

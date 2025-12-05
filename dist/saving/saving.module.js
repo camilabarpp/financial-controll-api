@@ -10,11 +10,18 @@ exports.SavingModule = void 0;
 const common_1 = require("@nestjs/common");
 const saving_controller_1 = require("./saving.controller");
 const saving_service_1 = require("./saving.service");
+const saving_schema_1 = require("./type/saving.schema");
+const mongoose_1 = require("@nestjs/mongoose");
+const passport_1 = require("@nestjs/passport");
 let SavingModule = class SavingModule {
 };
 exports.SavingModule = SavingModule;
 exports.SavingModule = SavingModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            mongoose_1.MongooseModule.forFeature([{ name: saving_schema_1.Saving.name, schema: saving_schema_1.SavingSchema }]),
+            passport_1.PassportModule.register({ defaultStrategy: 'jwt' })
+        ],
         controllers: [saving_controller_1.SavingController],
         providers: [saving_service_1.SavingService]
     })

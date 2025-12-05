@@ -16,9 +16,10 @@ exports.TransactionService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const expense_schema_1 = require("../expense/expense.schema");
+const transaction_schema_1 = require("./type/transaction.schema");
 const transaction_type_enum_1 = require("./type/transaction.type.enum");
 const data_utils_1 = require("../common/utils/data-utils");
+const utils_1 = require("../common/utils/utils");
 let TransactionService = class TransactionService {
     transactionModel;
     constructor(transactionModel) {
@@ -28,7 +29,7 @@ let TransactionService = class TransactionService {
         const startDate = await (0, data_utils_1.getStartDate)(period);
         const endDate = (0, data_utils_1.getEndDate)(period);
         const query = this.buildQuery(userId, startDate, endDate, search, transactionType);
-        const sortObj = this.buildSort(sort);
+        const sortObj = (0, utils_1.buildSort)(sort);
         const skip = (currentPage - 1) * limit;
         const [transactions, total, income, expense] = await Promise.all([
             this.transactionModel
@@ -122,7 +123,7 @@ let TransactionService = class TransactionService {
     async getTransactionsCategories(userId, search) {
         const filter = { user: userId };
         if (search?.trim()) {
-            const sanitized = this.escapeRegex(search.trim());
+            const sanitized = (0, utils_1.escapeRegex)(search.trim());
             filter.category = { $regex: sanitized, $options: "i" };
         }
         const result = await this.transactionModel
@@ -153,7 +154,7 @@ let TransactionService = class TransactionService {
             date: { $gte: startDate, $lte: endDate },
         };
         if (search?.trim()) {
-            const sanitized = this.escapeRegex(search.trim());
+            const sanitized = (0, utils_1.escapeRegex)(search.trim());
             query.$or = [
                 { description: { $regex: sanitized, $options: "i" } },
                 { category: { $regex: sanitized, $options: "i" } },
@@ -167,21 +168,6 @@ let TransactionService = class TransactionService {
         }
         return query;
     }
-    buildSort(sort) {
-        if (sort === "ASC" || sort === "DESC") {
-            return {
-                amount: sort === "ASC" ? 1 : -1,
-                date: -1,
-                _id: -1,
-            };
-        }
-        else {
-            return {
-                date: -1,
-                _id: -1,
-            };
-        }
-    }
     async getTotalAmount(query, type) {
         const match = { ...query, type };
         const result = await this.transactionModel.aggregate([
@@ -190,14 +176,11 @@ let TransactionService = class TransactionService {
         ]);
         return result[0]?.total ?? 0;
     }
-    escapeRegex(text) {
-        return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
 };
 exports.TransactionService = TransactionService;
 exports.TransactionService = TransactionService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(expense_schema_1.Transaction.name)),
+    __param(0, (0, mongoose_1.InjectModel)(transaction_schema_1.Transaction.name)),
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], TransactionService);
 //# sourceMappingURL=transaction.service.js.map

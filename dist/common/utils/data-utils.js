@@ -25,8 +25,7 @@ function getEndDate(period) {
             return quarterEnd;
         }
         case period_type_enum_1.PeriodType.YEAR: {
-            const yearEnd = new Date(now.getFullYear(), 11, 31);
-            yearEnd.setHours(23, 59, 59, 999);
+            const yearEnd = new Date(Date.UTC(now.getUTCFullYear(), 11, 31, 23, 59, 59, 999));
             return yearEnd;
         }
         default: {
@@ -51,9 +50,7 @@ async function getStartDate(period) {
             return quarterAgo;
         }
         case period_type_enum_1.PeriodType.YEAR: {
-            const yearAgo = new Date(now);
-            yearAgo.setFullYear(now.getFullYear() - 1);
-            return new Date(yearAgo.getFullYear(), 0, 1);
+            return new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
         }
         default: {
             return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));

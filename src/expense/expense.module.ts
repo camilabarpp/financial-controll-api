@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ExpenseController } from './expense.controller';
 import { ExpenseService } from './expense.service';
-import { Transaction, TransactionSchema } from './expense.schema';
+import { Transaction, TransactionSchema } from '../transaction/type/transaction.schema';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({

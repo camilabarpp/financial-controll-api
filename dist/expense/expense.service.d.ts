@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Transaction } from './expense.schema';
+import { Transaction } from '../transaction/type/transaction.schema';
 import { PeriodType } from '../transaction/type/period-type.enum';
 export declare class ExpenseService {
     private transactionModel;

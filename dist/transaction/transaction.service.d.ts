@@ -1,5 +1,5 @@
 import { Model } from "mongoose";
-import { Transaction } from "src/expense/expense.schema";
+import { Transaction } from "src/transaction/type/transaction.schema";
 import { TransactionBalanceResponse } from "./type/transaction.balance.response";
 import { TransactionResponse } from "./type/transaction.response";
 import { PeriodType } from "src/transaction/type/period-type.enum";
@@ -28,7 +28,5 @@ export declare class TransactionService {
     getTransactionsCategories(userId: string, search?: string): Promise<TransactionCategory[]>;
     private getTransactionsResponse;
     private buildQuery;
-    private buildSort;
     private getTotalAmount;
-    private escapeRegex;
 }

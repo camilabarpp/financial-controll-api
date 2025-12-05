@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Transaction } from './expense.schema';
+import { Transaction } from '../transaction/type/transaction.schema';
 import { PeriodType } from '../transaction/type/period-type.enum';
 import moment from 'moment';
 import { getEndDate, getStartDate } from 'src/common/utils/data-utils';
@@ -39,7 +39,6 @@ export class ExpenseService {
         const result = [];
         const months = 6;
         const now = moment();
-        console.log('Grouping by month for', months, 'months');
         for (let i = 0; i < months; i++) {
             const month = now.clone().subtract(i, 'months');
             const monthAbbr = month.format('MMM').toUpperCase();

@@ -1,4 +1,41 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Body, Post, Put, Delete, Param, HttpCode } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { SavingService } from './saving.service';
+import { SavingRequest } from './type/saving.request';
+import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { User } from 'src/user/type/user.schema';
+import { PeriodType } from 'src/transaction/type/period-type.enum';
 
+@UseGuards(AuthGuard())
 @Controller('saving')
-export class SavingController {}
+export class SavingController {
+    constructor(private readonly savingService: SavingService) {}
+
+    @Get()
+    async getSavingsByUser(
+        @GetUser() user: User,
+        @Query('period') period: PeriodType,
+        @Query('search') search: string,
+        @Query('sort') sort: 'ASC' | 'DESC',
+        @Query('currentPage') currentPage: number = 1,
+    ) {
+        return this.savingService.getSavingsByUser(user.id, period, search, sort, currentPage);
+    }
+
+    @Get(':id')
+    async getSavingById(
+        @GetUser() user: User,
+        @Param('id') savingId: string
+    ) {
+        return this.savingService.getSavingById(user.id, savingId);
+    }
+
+    @HttpCode(201)
+    @Post()
+    async createSaving(
+        @GetUser() user: User,
+        @Body() body: SavingRequest
+    ) {
+        return this.savingService.createSaving(user.id, body);
+    }
+}

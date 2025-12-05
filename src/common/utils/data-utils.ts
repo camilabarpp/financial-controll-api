@@ -24,8 +24,7 @@ export function getEndDate(period: PeriodType): Date {
       return quarterEnd;
     }
     case PeriodType.YEAR: {
-      const yearEnd = new Date(now.getFullYear(), 11, 31);
-      yearEnd.setHours(23, 59, 59, 999);
+      const yearEnd = new Date(Date.UTC(now.getUTCFullYear(), 11, 31, 23, 59, 59, 999));
       return yearEnd;
     }
     default: {
@@ -55,9 +54,7 @@ export async function getStartDate(period: PeriodType): Promise<Date> {
       return quarterAgo;
     }
     case PeriodType.YEAR: {
-      const yearAgo = new Date(now);
-      yearAgo.setFullYear(now.getFullYear() - 1);
-      return new Date(yearAgo.getFullYear(), 0, 1);
+      return new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
     }
     default: {
       return new Date(

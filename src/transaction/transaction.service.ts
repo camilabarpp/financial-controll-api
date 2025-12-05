@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, SortOrder } from "mongoose";
-import { Transaction } from "src/expense/expense.schema";
+import { Transaction } from "src/transaction/type/transaction.schema";
 import { TransactionBalanceResponse } from "./type/transaction.balance.response";
 import { TransactionType } from "./type/transaction.type.enum";
 import { TransactionResponse } from "./type/transaction.response";
@@ -9,6 +9,7 @@ import { PeriodType } from "src/transaction/type/period-type.enum";
 import { TransactionRequest } from "./type/transaction.request";
 import { getStartDate, getEndDate } from "src/common/utils/data-utils";
 import { TransactionCategory } from "./type/transaction.category";
+import { buildSort, escapeRegex } from "src/common/utils/utils";
 
 @Injectable()
 export class TransactionService {
@@ -42,7 +43,7 @@ export class TransactionService {
       search,
       transactionType
     );
-    const sortObj = this.buildSort(sort);
+    const sortObj = buildSort(sort);
     const skip = (currentPage - 1) * limit;
 
     const [transactions, total, income, expense] = await Promise.all([
@@ -180,7 +181,7 @@ export class TransactionService {
     const filter: any = { user: userId };
 
     if (search?.trim()) {
-      const sanitized = this.escapeRegex(search.trim());
+      const sanitized = escapeRegex(search.trim());
       filter.category = { $regex: sanitized, $options: "i" };
     }
 
@@ -224,7 +225,7 @@ export class TransactionService {
     };
 
     if (search?.trim()) {
-      const sanitized = this.escapeRegex(search.trim());
+      const sanitized = escapeRegex(search.trim());
       query.$or = [
         { description: { $regex: sanitized, $options: "i" } },
         { category: { $regex: sanitized, $options: "i" } },
@@ -240,23 +241,6 @@ export class TransactionService {
     return query;
   }
 
-  private buildSort(
-    sort: "ASC" | "DESC" | undefined
-  ): Record<string, SortOrder> {
-    if (sort === "ASC" || sort === "DESC") {
-      return {
-        amount: sort === "ASC" ? 1 : -1,
-        date: -1,
-        _id: -1,
-      };
-    } else {
-      return {
-        date: -1,
-        _id: -1,
-      };
-    }
-  }
-
    private async getTotalAmount(
     query: Record<string, any>,
     type: TransactionType
@@ -267,9 +251,5 @@ export class TransactionService {
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
     return result[0]?.total ?? 0;
-  }
-
-  private escapeRegex(text: string): string {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 }

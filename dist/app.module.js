@@ -14,6 +14,7 @@ const user_module_1 = require("./user/user.module");
 const auth_module_1 = require("./auth/auth.module");
 const expense_module_1 = require("./expense/expense.module");
 const transaction_module_1 = require("./transaction/transaction.module");
+const saving_module_1 = require("./saving/saving.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,7 +32,8 @@ exports.AppModule = AppModule = __decorate([
             user_module_1.UserModule,
             auth_module_1.AuthModule,
             expense_module_1.ExpenseModule,
-            transaction_module_1.TransactionModule
+            transaction_module_1.TransactionModule,
+            saving_module_1.SavingModule
         ],
         controllers: [],
         providers: [],

@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ExpenseModule } from './expense/expense.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { SavingModule } from './saving/saving.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { TransactionModule } from './transaction/transaction.module';
     UserModule,
     AuthModule,
     ExpenseModule,
-    TransactionModule
+    TransactionModule,
+    SavingModule
   ],
   controllers: [],
   providers: [],

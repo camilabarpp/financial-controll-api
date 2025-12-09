@@ -1,7 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Saving } from './type/saving.schema';
-import { Model } from 'mongoose';
 import { SavingResponse } from './type/saving.response';
 import { SavingRequest } from './type/saving.request';
 import { getEndDate, getStartDate } from 'src/common/utils/data-utils';

@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { SavingTransaction } from "../type/saving.transaction.schema";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
+import { SavingRequest } from "../type/saving.request";
 
 @Injectable()
 export class SavingTransactionRepository {
@@ -230,5 +231,13 @@ export class SavingTransactionRepository {
                 }
             }
         ]).exec();
+    }
+
+    async createSavingTransaction(savingId: string, transaction: SavingRequest): Promise<SavingTransaction> {
+        const createdTransaction = new this.savingTransactionModel({
+            ...transaction,
+            saving: savingId
+        });
+        return createdTransaction.save();
     }
 }

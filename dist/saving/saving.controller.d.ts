@@ -14,6 +14,7 @@ export declare class SavingController {
     getSavingTotals(user: User): Promise<import("./type/savinng.total.response").SavingTotalsResponse>;
     getSavingById(user: User, savingId: string): Promise<import("./type/saving.detail.response").SavingDetailResponse>;
     getSemesterTransactionsBySaving(user: User, savingId: string): Promise<import("./type/saving.semester.transactions").SavingSemesterTransactions[]>;
+    createSavingTransaction(user: User, savingId: string, body: SavingRequest): Promise<import("./type/saving.transaction").SavingTransactionResponse>;
     createSaving(user: User, body: SavingRequest): Promise<import("./type/saving.response").SavingResponse>;
     updateSaving(user: User, savingId: string, body: Partial<SavingRequest>): Promise<import("./type/saving.response").SavingResponse>;
     deleteSaving(user: User, savingId: string): Promise<void>;

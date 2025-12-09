@@ -37,6 +37,9 @@ let SavingController = class SavingController {
     async getSemesterTransactionsBySaving(user, savingId) {
         return this.savingService.getSemesterTransactionsBySaving(user.id, savingId);
     }
+    async createSavingTransaction(user, savingId, body) {
+        return this.savingService.createSavingTransaction(user.id, savingId, body);
+    }
     async createSaving(user, body) {
         return this.savingService.createSaving(user.id, body);
     }
@@ -82,6 +85,15 @@ __decorate([
     __metadata("design:paramtypes", [user_schema_1.User, String]),
     __metadata("design:returntype", Promise)
 ], SavingController.prototype, "getSemesterTransactionsBySaving", null);
+__decorate([
+    (0, common_1.Post)(':id/transactions'),
+    __param(0, (0, get_user_decorator_1.GetUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_schema_1.User, String, saving_request_1.SavingRequest]),
+    __metadata("design:returntype", Promise)
+], SavingController.prototype, "createSavingTransaction", null);
 __decorate([
     (0, common_1.HttpCode)(201),
     (0, common_1.Post)(),

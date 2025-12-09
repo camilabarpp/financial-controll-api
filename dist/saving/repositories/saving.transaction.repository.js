@@ -231,6 +231,13 @@ let SavingTransactionRepository = class SavingTransactionRepository {
             }
         ]).exec();
     }
+    async createSavingTransaction(savingId, transaction) {
+        const createdTransaction = new this.savingTransactionModel({
+            ...transaction,
+            saving: savingId
+        });
+        return createdTransaction.save();
+    }
 };
 exports.SavingTransactionRepository = SavingTransactionRepository;
 exports.SavingTransactionRepository = SavingTransactionRepository = __decorate([

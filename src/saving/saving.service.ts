@@ -147,6 +147,29 @@ export class SavingService {
         };
     }
 
+    async createSavingTransaction(
+        userId: string,
+        savingId: string,
+        transactionRequest: SavingRequest
+    ): Promise<SavingTransactionResponse> {
+        const isSavingOwnedByUser = await this.savingRepository.savingExists(userId, savingId);
+        if (!isSavingOwnedByUser) {
+            throw new NotFoundException("Economia não encontrada para o usuário");
+        }
+        const savedTransaction = await this.savingTransactionRepository.createSavingTransaction(
+            savingId,
+            transactionRequest
+        );  
+
+        return {
+            id: savedTransaction._id.toString(),
+            type: savedTransaction.type,
+            value: savedTransaction.value,
+            date: savedTransaction.date,
+            description: savedTransaction.description || 'Sem descrição',
+        };
+    }
+
     private toResponse(saving: Saving): SavingResponse {
         return {
             id: saving._id.toString(),

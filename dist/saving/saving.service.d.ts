@@ -4,6 +4,7 @@ import { PeriodType } from 'src/transaction/type/period-type.enum';
 import { SavingTotalsResponse } from './type/savinng.total.response';
 import { SavingDetailResponse } from './type/saving.detail.response';
 import { SavingSemesterTransactions } from './type/saving.semester.transactions';
+import { SavingTransactionResponse } from './type/saving.transaction';
 import { SavingRepository } from './repositories/saving.repository';
 import { SavingTransactionRepository } from './repositories/saving.transaction.repository';
 export declare class SavingService {
@@ -22,6 +23,7 @@ export declare class SavingService {
     updateSaving(userId: string, savingId: string, savingRequest: Partial<SavingRequest>): Promise<SavingResponse>;
     deleteSaving(userId: string, savingId: string): Promise<void>;
     getSavingTotals(userId: string): Promise<SavingTotalsResponse>;
+    createSavingTransaction(userId: string, savingId: string, transactionRequest: SavingRequest): Promise<SavingTransactionResponse>;
     private toResponse;
     private toSavingTransactionResponse;
     private groupByMonth;

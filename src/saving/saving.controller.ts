@@ -43,6 +43,15 @@ export class SavingController {
         return this.savingService.getSemesterTransactionsBySaving(user.id, savingId);
     }
 
+    @Post(':id/transactions')
+    async createSavingTransaction(
+        @GetUser() user: User,
+        @Param('id') savingId: string,
+        @Body() body: SavingRequest
+    ) {
+        return this.savingService.createSavingTransaction(user.id, savingId, body);
+    }
+
     @HttpCode(201)
     @Post()
     async createSaving(

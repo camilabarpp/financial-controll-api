@@ -107,6 +107,20 @@ let SavingService = class SavingService {
             monthlyExpenses: Number((totals.monthlyExpenses ?? 0).toFixed(2)),
         };
     }
+    async createSavingTransaction(userId, savingId, transactionRequest) {
+        const isSavingOwnedByUser = await this.savingRepository.savingExists(userId, savingId);
+        if (!isSavingOwnedByUser) {
+            throw new common_1.NotFoundException("Economia não encontrada para o usuário");
+        }
+        const savedTransaction = await this.savingTransactionRepository.createSavingTransaction(savingId, transactionRequest);
+        return {
+            id: savedTransaction._id.toString(),
+            type: savedTransaction.type,
+            value: savedTransaction.value,
+            date: savedTransaction.date,
+            description: savedTransaction.description || 'Sem descrição',
+        };
+    }
     toResponse(saving) {
         return {
             id: saving._id.toString(),

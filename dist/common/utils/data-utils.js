@@ -24,6 +24,13 @@ function getEndDate(period) {
             quarterEnd.setHours(23, 59, 59, 999);
             return quarterEnd;
         }
+        case period_type_enum_1.PeriodType.SEMESTER: {
+            const currentMonth = now.getMonth();
+            const semesterEndMonth = currentMonth < 6 ? 5 : 11;
+            const semesterEnd = new Date(now.getFullYear(), semesterEndMonth + 1, 0);
+            semesterEnd.setHours(23, 59, 59, 999);
+            return semesterEnd;
+        }
         case period_type_enum_1.PeriodType.YEAR: {
             const yearEnd = new Date(Date.UTC(now.getUTCFullYear(), 11, 31, 23, 59, 59, 999));
             return yearEnd;
@@ -48,6 +55,11 @@ async function getStartDate(period) {
             const quarterAgo = new Date(now);
             quarterAgo.setMonth(now.getMonth() - 3);
             return quarterAgo;
+        }
+        case period_type_enum_1.PeriodType.SEMESTER: {
+            const semesterAgo = new Date(now);
+            semesterAgo.setMonth(now.getMonth() - 6);
+            return semesterAgo;
         }
         case period_type_enum_1.PeriodType.YEAR: {
             return new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0));

@@ -7,7 +7,7 @@ import { User } from 'src/user/type/user.schema';
 import { PeriodType } from 'src/transaction/type/period-type.enum';
 
 @UseGuards(AuthGuard())
-@Controller('saving')
+@Controller('savings')
 export class SavingController {
     constructor(private readonly savingService: SavingService) {}
 
@@ -22,12 +22,25 @@ export class SavingController {
         return this.savingService.getSavingsByUser(user.id, period, search, sort, currentPage);
     }
 
-    @Get(':id')
+    @Get('totals')
+    async getSavingTotals(@GetUser() user: User) {
+        return this.savingService.getSavingTotals(user.id);
+    }
+
+    @Get(':id/detail')
     async getSavingById(
         @GetUser() user: User,
         @Param('id') savingId: string
     ) {
         return this.savingService.getSavingById(user.id, savingId);
+    }
+
+    @Get(':id/semester-transactions')
+    async getSemesterTransactionsBySaving(
+        @GetUser() user: User,
+        @Param('id') savingId: string
+    ) {
+        return this.savingService.getSemesterTransactionsBySaving(user.id, savingId);
     }
 
     @HttpCode(201)
@@ -37,5 +50,23 @@ export class SavingController {
         @Body() body: SavingRequest
     ) {
         return this.savingService.createSaving(user.id, body);
+    }
+
+    @Put(':id')
+    async updateSaving(
+        @GetUser() user: User,
+        @Param('id') savingId: string,
+        @Body() body: Partial<SavingRequest>
+    ) {
+        return this.savingService.updateSaving(user.id, savingId, body);
+    }
+
+    @HttpCode(204)
+    @Delete(':id')
+    async deleteSaving(
+        @GetUser() user: User,
+        @Param('id') savingId: string
+    ) {
+        return this.savingService.deleteSaving(user.id, savingId);
     }
 }

@@ -6,6 +6,7 @@ var PeriodType;
     PeriodType["WEEK"] = "WEEK";
     PeriodType["MONTH"] = "MONTH";
     PeriodType["QUARTER"] = "QUARTER";
+    PeriodType["SEMESTER"] = "SEMESTER";
     PeriodType["YEAR"] = "YEAR";
 })(PeriodType || (exports.PeriodType = PeriodType = {}));
 //# sourceMappingURL=period-type.enum.js.map

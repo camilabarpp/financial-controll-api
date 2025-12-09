@@ -7,10 +7,14 @@ export declare class SavingController {
     constructor(savingService: SavingService);
     getSavingsByUser(user: User, period: PeriodType, search: string, sort: 'ASC' | 'DESC', currentPage?: number): Promise<{
         savings: import("./type/saving.response").SavingResponse[];
-        total: number;
+        total: any;
         totalPages: number;
         currentPage: number;
     }>;
-    getSavingById(user: User, savingId: string): Promise<import("./type/saving.response").SavingResponse>;
+    getSavingTotals(user: User): Promise<import("./type/savinng.total.response").SavingTotalsResponse>;
+    getSavingById(user: User, savingId: string): Promise<import("./type/saving.detail.response").SavingDetailResponse>;
+    getSemesterTransactionsBySaving(user: User, savingId: string): Promise<import("./type/saving.semester.transactions").SavingSemesterTransactions[]>;
     createSaving(user: User, body: SavingRequest): Promise<import("./type/saving.response").SavingResponse>;
+    updateSaving(user: User, savingId: string, body: Partial<SavingRequest>): Promise<import("./type/saving.response").SavingResponse>;
+    deleteSaving(user: User, savingId: string): Promise<void>;
 }

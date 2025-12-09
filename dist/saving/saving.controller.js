@@ -28,11 +28,23 @@ let SavingController = class SavingController {
     async getSavingsByUser(user, period, search, sort, currentPage = 1) {
         return this.savingService.getSavingsByUser(user.id, period, search, sort, currentPage);
     }
+    async getSavingTotals(user) {
+        return this.savingService.getSavingTotals(user.id);
+    }
     async getSavingById(user, savingId) {
         return this.savingService.getSavingById(user.id, savingId);
     }
+    async getSemesterTransactionsBySaving(user, savingId) {
+        return this.savingService.getSemesterTransactionsBySaving(user.id, savingId);
+    }
     async createSaving(user, body) {
         return this.savingService.createSaving(user.id, body);
+    }
+    async updateSaving(user, savingId, body) {
+        return this.savingService.updateSaving(user.id, savingId, body);
+    }
+    async deleteSaving(user, savingId) {
+        return this.savingService.deleteSaving(user.id, savingId);
     }
 };
 exports.SavingController = SavingController;
@@ -48,13 +60,28 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SavingController.prototype, "getSavingsByUser", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)('totals'),
+    __param(0, (0, get_user_decorator_1.GetUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_schema_1.User]),
+    __metadata("design:returntype", Promise)
+], SavingController.prototype, "getSavingTotals", null);
+__decorate([
+    (0, common_1.Get)(':id/detail'),
     __param(0, (0, get_user_decorator_1.GetUser)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_schema_1.User, String]),
     __metadata("design:returntype", Promise)
 ], SavingController.prototype, "getSavingById", null);
+__decorate([
+    (0, common_1.Get)(':id/semester-transactions'),
+    __param(0, (0, get_user_decorator_1.GetUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_schema_1.User, String]),
+    __metadata("design:returntype", Promise)
+], SavingController.prototype, "getSemesterTransactionsBySaving", null);
 __decorate([
     (0, common_1.HttpCode)(201),
     (0, common_1.Post)(),
@@ -65,9 +92,27 @@ __decorate([
         saving_request_1.SavingRequest]),
     __metadata("design:returntype", Promise)
 ], SavingController.prototype, "createSaving", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, get_user_decorator_1.GetUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_schema_1.User, String, Object]),
+    __metadata("design:returntype", Promise)
+], SavingController.prototype, "updateSaving", null);
+__decorate([
+    (0, common_1.HttpCode)(204),
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, get_user_decorator_1.GetUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_schema_1.User, String]),
+    __metadata("design:returntype", Promise)
+], SavingController.prototype, "deleteSaving", null);
 exports.SavingController = SavingController = __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)()),
-    (0, common_1.Controller)('saving'),
+    (0, common_1.Controller)('savings'),
     __metadata("design:paramtypes", [saving_service_1.SavingService])
 ], SavingController);
 //# sourceMappingURL=saving.controller.js.map

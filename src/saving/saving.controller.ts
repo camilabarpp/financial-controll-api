@@ -5,6 +5,7 @@ import { SavingRequest } from './type/saving.request';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/type/user.schema';
 import { PeriodType } from 'src/transaction/type/period-type.enum';
+import { SavingTransactionRequest } from './type/saving.transaction.request';
 
 @UseGuards(AuthGuard())
 @Controller('savings')
@@ -30,9 +31,10 @@ export class SavingController {
     @Get(':id/detail')
     async getSavingById(
         @GetUser() user: User,
-        @Param('id') savingId: string
+        @Param('id') savingId: string,
+        @Query('transactionPage') transactionPage: number = 1
     ) {
-        return this.savingService.getSavingById(user.id, savingId);
+        return this.savingService.getSavingById(user.id, savingId, transactionPage);
     }
 
     @Get(':id/semester-transactions')
@@ -47,9 +49,28 @@ export class SavingController {
     async createSavingTransaction(
         @GetUser() user: User,
         @Param('id') savingId: string,
-        @Body() body: SavingRequest
+        @Body() body: SavingTransactionRequest
     ) {
         return this.savingService.createSavingTransaction(user.id, savingId, body);
+    }
+
+    @Put(':savingId/transactions/:transactionId')
+    async updateSavingTransaction(
+        @GetUser() user: User,
+        @Param('savingId') savingId: string,
+        @Param('transactionId') transactionId: string,
+        @Body() body: Partial<SavingTransactionRequest>
+    ) {
+        return this.savingService.updateSavingTransaction(user.id, savingId, transactionId, body);
+    }
+
+    @Delete(':savingId/transactions/:transactionId')
+    async deleteSavingTransaction(
+        @GetUser() user: User,
+        @Param('savingId') savingId: string,
+        @Param('transactionId') transactionId: string
+    ) {
+        return this.savingService.deleteSavingTransaction(user.id, savingId, transactionId);
     }
 
     @HttpCode(201)

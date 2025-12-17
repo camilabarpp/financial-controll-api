@@ -10,7 +10,8 @@ import { SavingSemesterTransactions } from './type/saving.semester.transactions'
 import { SavingTransaction, SavingTransactionResponse } from './type/saving.transaction';
 import moment from 'moment';
 import { SavingRepository } from './repositories/saving.repository';
-import { SavingTransactionRepository } from './repositories/saving.transaction.repository';;
+import { SavingTransactionRepository } from './repositories/saving.transaction.repository';import { SavingTransactionRequest } from './type/saving.transaction.request';
+;
 
 @Injectable()
 export class SavingService {
@@ -49,13 +50,13 @@ export class SavingService {
         };
     }
 
-    async getSavingById(userId: string, savingId: string, page: number = 1, limit: number = 5): Promise<SavingDetailResponse> {
+    async getSavingById(userId: string, savingId: string, transactionPage: number = 1, limit: number = 5): Promise<SavingDetailResponse> {
         const saving = await this.savingRepository.findOne(userId, savingId);
         if (!saving) {
             throw new NotFoundException("Economia não encontrada");
         }
 
-        const savingTransactions = await this.savingTransactionRepository.findSavingTransactionsPaginated(savingId, page, limit);
+        const savingTransactions = await this.savingTransactionRepository.findSavingTransactionsPaginated(savingId, transactionPage, limit);
         const savingTotal = await this.savingTransactionRepository.getCurrentBalance(saving._id.toString());
         const lastSaved = await this.savingTransactionRepository.getLastSavedAmount(saving._id.toString());
 
@@ -69,7 +70,7 @@ export class SavingService {
             transactions: this.toSavingTransactionResponse(savingTransactions.transactions) || [],
             transactionsTotal: savingTransactions.total,
             transactionsTotalPages: savingTransactions.totalPages,
-            transactionsCurrentPage: 1
+            transactionsCurrentPage: transactionPage,
         }    
     }
     
@@ -150,7 +151,7 @@ export class SavingService {
     async createSavingTransaction(
         userId: string,
         savingId: string,
-        transactionRequest: SavingRequest
+        transactionRequest: SavingTransactionRequest
     ): Promise<SavingTransactionResponse> {
         const isSavingOwnedByUser = await this.savingRepository.savingExists(userId, savingId);
         if (!isSavingOwnedByUser) {
@@ -168,6 +169,45 @@ export class SavingService {
             date: savedTransaction.date,
             description: savedTransaction.description || 'Sem descrição',
         };
+    }
+
+    async updateSavingTransaction(
+        userId: string,
+        savingId: string,
+        transactionId: string,
+        transactionRequest: Partial<SavingTransactionRequest>
+    ): Promise<SavingTransactionResponse> {
+        const isSavingOwnedByUser = await this.savingRepository.savingExists(userId, savingId);
+        if (!isSavingOwnedByUser) {
+            throw new NotFoundException("Economia não encontrada para o usuário");
+        }
+        const updatedTransaction = await this.savingTransactionRepository.updateSavingTransaction(
+            savingId,
+            transactionId,
+            transactionRequest
+        );
+        if (!updatedTransaction) {
+            throw new NotFoundException("Transação de economia não encontrada");
+        }
+        return {
+            id: updatedTransaction._id.toString(),
+            type: updatedTransaction.type,
+            value: updatedTransaction.value,
+            date: updatedTransaction.date,
+            description: updatedTransaction.description || 'Sem descrição',
+        };
+    }
+
+    async deleteSavingTransaction(
+        userId: string,
+        savingId: string,
+        transactionId: string
+    ): Promise<void> {
+        const isSavingOwnedByUser = await this.savingRepository.savingExists(userId, savingId);
+        if (!isSavingOwnedByUser) {
+            throw new NotFoundException("Economia não encontrada para o usuário");
+        }
+        await this.savingTransactionRepository.deleteSavingTransaction(savingId, transactionId);
     }
 
     private toResponse(saving: Saving): SavingResponse {

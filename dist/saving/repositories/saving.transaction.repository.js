@@ -238,6 +238,12 @@ let SavingTransactionRepository = class SavingTransactionRepository {
         });
         return createdTransaction.save();
     }
+    async updateSavingTransaction(savingId, transactionId, transaction) {
+        return this.savingTransactionModel.findOneAndUpdate({ _id: transactionId, saving: savingId }, { $set: transaction }, { new: true }).exec();
+    }
+    async deleteSavingTransaction(savingId, transactionId) {
+        await this.savingTransactionModel.deleteOne({ _id: transactionId, saving: savingId }).exec();
+    }
 };
 exports.SavingTransactionRepository = SavingTransactionRepository;
 exports.SavingTransactionRepository = SavingTransactionRepository = __decorate([

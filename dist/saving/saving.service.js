@@ -39,12 +39,12 @@ let SavingService = class SavingService {
             currentPage,
         };
     }
-    async getSavingById(userId, savingId, page = 1, limit = 5) {
+    async getSavingById(userId, savingId, transactionPage = 1, limit = 5) {
         const saving = await this.savingRepository.findOne(userId, savingId);
         if (!saving) {
             throw new common_1.NotFoundException("Economia não encontrada");
         }
-        const savingTransactions = await this.savingTransactionRepository.findSavingTransactionsPaginated(savingId, page, limit);
+        const savingTransactions = await this.savingTransactionRepository.findSavingTransactionsPaginated(savingId, transactionPage, limit);
         const savingTotal = await this.savingTransactionRepository.getCurrentBalance(saving._id.toString());
         const lastSaved = await this.savingTransactionRepository.getLastSavedAmount(saving._id.toString());
         return {
@@ -57,7 +57,7 @@ let SavingService = class SavingService {
             transactions: this.toSavingTransactionResponse(savingTransactions.transactions) || [],
             transactionsTotal: savingTransactions.total,
             transactionsTotalPages: savingTransactions.totalPages,
-            transactionsCurrentPage: 1
+            transactionsCurrentPage: transactionPage,
         };
     }
     async getSemesterTransactionsBySaving(userId, savingId) {
@@ -120,6 +120,30 @@ let SavingService = class SavingService {
             date: savedTransaction.date,
             description: savedTransaction.description || 'Sem descrição',
         };
+    }
+    async updateSavingTransaction(userId, savingId, transactionId, transactionRequest) {
+        const isSavingOwnedByUser = await this.savingRepository.savingExists(userId, savingId);
+        if (!isSavingOwnedByUser) {
+            throw new common_1.NotFoundException("Economia não encontrada para o usuário");
+        }
+        const updatedTransaction = await this.savingTransactionRepository.updateSavingTransaction(savingId, transactionId, transactionRequest);
+        if (!updatedTransaction) {
+            throw new common_1.NotFoundException("Transação de economia não encontrada");
+        }
+        return {
+            id: updatedTransaction._id.toString(),
+            type: updatedTransaction.type,
+            value: updatedTransaction.value,
+            date: updatedTransaction.date,
+            description: updatedTransaction.description || 'Sem descrição',
+        };
+    }
+    async deleteSavingTransaction(userId, savingId, transactionId) {
+        const isSavingOwnedByUser = await this.savingRepository.savingExists(userId, savingId);
+        if (!isSavingOwnedByUser) {
+            throw new common_1.NotFoundException("Economia não encontrada para o usuário");
+        }
+        await this.savingTransactionRepository.deleteSavingTransaction(savingId, transactionId);
     }
     toResponse(saving) {
         return {

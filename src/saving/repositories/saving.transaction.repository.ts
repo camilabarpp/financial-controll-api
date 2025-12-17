@@ -3,6 +3,7 @@ import { SavingTransaction } from "../type/saving.transaction.schema";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { SavingRequest } from "../type/saving.request";
+import { SavingTransactionRequest } from "../type/saving.transaction.request";
 
 @Injectable()
 export class SavingTransactionRepository {
@@ -233,11 +234,23 @@ export class SavingTransactionRepository {
         ]).exec();
     }
 
-    async createSavingTransaction(savingId: string, transaction: SavingRequest): Promise<SavingTransaction> {
+    async createSavingTransaction(savingId: string, transaction: SavingTransactionRequest): Promise<SavingTransaction> {
         const createdTransaction = new this.savingTransactionModel({
             ...transaction,
             saving: savingId
         });
         return createdTransaction.save();
+    }
+
+    async updateSavingTransaction(savingId: string, transactionId: string, transaction: Partial<SavingTransactionRequest>): Promise<SavingTransaction> {
+        return this.savingTransactionModel.findOneAndUpdate(
+            { _id: transactionId, saving: savingId },
+            { $set: transaction },
+            { new: true }
+        ).exec();
+    }
+
+    async deleteSavingTransaction(savingId: string, transactionId: string): Promise<void> {
+        await this.savingTransactionModel.deleteOne({ _id: transactionId, saving: savingId }).exec();
     }
 }

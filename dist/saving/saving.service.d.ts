@@ -7,6 +7,7 @@ import { SavingSemesterTransactions } from './type/saving.semester.transactions'
 import { SavingTransactionResponse } from './type/saving.transaction';
 import { SavingRepository } from './repositories/saving.repository';
 import { SavingTransactionRepository } from './repositories/saving.transaction.repository';
+import { SavingTransactionRequest } from './type/saving.transaction.request';
 export declare class SavingService {
     private readonly savingRepository;
     private readonly savingTransactionRepository;
@@ -17,13 +18,15 @@ export declare class SavingService {
         totalPages: number;
         currentPage: number;
     }>;
-    getSavingById(userId: string, savingId: string, page?: number, limit?: number): Promise<SavingDetailResponse>;
+    getSavingById(userId: string, savingId: string, transactionPage?: number, limit?: number): Promise<SavingDetailResponse>;
     getSemesterTransactionsBySaving(userId: string, savingId: string): Promise<SavingSemesterTransactions[]>;
     createSaving(userId: string, savingRequest: SavingRequest): Promise<SavingResponse>;
     updateSaving(userId: string, savingId: string, savingRequest: Partial<SavingRequest>): Promise<SavingResponse>;
     deleteSaving(userId: string, savingId: string): Promise<void>;
     getSavingTotals(userId: string): Promise<SavingTotalsResponse>;
-    createSavingTransaction(userId: string, savingId: string, transactionRequest: SavingRequest): Promise<SavingTransactionResponse>;
+    createSavingTransaction(userId: string, savingId: string, transactionRequest: SavingTransactionRequest): Promise<SavingTransactionResponse>;
+    updateSavingTransaction(userId: string, savingId: string, transactionId: string, transactionRequest: Partial<SavingTransactionRequest>): Promise<SavingTransactionResponse>;
+    deleteSavingTransaction(userId: string, savingId: string, transactionId: string): Promise<void>;
     private toResponse;
     private toSavingTransactionResponse;
     private groupByMonth;

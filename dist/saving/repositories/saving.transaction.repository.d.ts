@@ -1,6 +1,6 @@
 import { SavingTransaction } from "../type/saving.transaction.schema";
 import { Model } from "mongoose";
-import { SavingRequest } from "../type/saving.request";
+import { SavingTransactionRequest } from "../type/saving.transaction.request";
 export declare class SavingTransactionRepository {
     private savingTransactionModel;
     constructor(savingTransactionModel: Model<SavingTransaction>);
@@ -14,5 +14,7 @@ export declare class SavingTransactionRepository {
     getCurrentBalance(savingId: string): Promise<number>;
     getLastSavedAmount(savingId: string): Promise<number>;
     getSemesterTransactions(savingId: string): Promise<SavingTransaction[]>;
-    createSavingTransaction(savingId: string, transaction: SavingRequest): Promise<SavingTransaction>;
+    createSavingTransaction(savingId: string, transaction: SavingTransactionRequest): Promise<SavingTransaction>;
+    updateSavingTransaction(savingId: string, transactionId: string, transaction: Partial<SavingTransactionRequest>): Promise<SavingTransaction>;
+    deleteSavingTransaction(savingId: string, transactionId: string): Promise<void>;
 }

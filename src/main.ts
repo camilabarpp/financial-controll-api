@@ -10,7 +10,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3001',
       'https://camilabarpp.github.io',
-      'https://financial-controll-site.onrender.com',
+      'https://financial-controll-site.onrender.com/',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });

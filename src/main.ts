@@ -11,11 +11,11 @@ async function bootstrap() {
       'http://localhost:3001',
       'https://camilabarpp.github.io',
       'https://financial-controll-site.onrender.com',
-      'https://financial-controll-site.onrender.com/',
-      'https://financial-controll-site.onrender.com/#',
-      'https://financial-controll-site.onrender.com/#/',
     ],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    credentials: true,
+    exposedHeaders: ['Authorization'],
   });
   app.use(bodyParser.json({ limit: '10mb' }));
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));

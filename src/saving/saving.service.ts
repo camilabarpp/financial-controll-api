@@ -70,7 +70,7 @@ export class SavingService {
             transactions: this.toSavingTransactionResponse(savingTransactions.transactions) || [],
             transactionsTotal: savingTransactions.total,
             transactionsTotalPages: savingTransactions.totalPages,
-            transactionsCurrentPage: transactionPage,
+            transactionsCurrentPage: transactionPage || 1,
         }    
     }
     

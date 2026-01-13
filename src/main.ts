@@ -9,8 +9,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3001', // para desenvolvimento local
-      'https://camilabarpp.github.io',
-      'https://camilabarpp.github.io/financial-controll-site',
+      'https://camilabarpp.github.io'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,

@@ -1,6 +1,5 @@
 import { SavingResponse } from './type/saving.response';
 import { SavingRequest } from './type/saving.request';
-import { PeriodType } from 'src/transaction/type/period-type.enum';
 import { SavingTotalsResponse } from './type/savinng.total.response';
 import { SavingDetailResponse } from './type/saving.detail.response';
 import { SavingSemesterTransactions } from './type/saving.semester.transactions';
@@ -12,7 +11,7 @@ export declare class SavingService {
     private readonly savingRepository;
     private readonly savingTransactionRepository;
     constructor(savingRepository: SavingRepository, savingTransactionRepository: SavingTransactionRepository);
-    getSavingsByUser(userId: string, period: PeriodType, search: string, sort: "ASC" | "DESC", currentPage?: number, limit?: number): Promise<{
+    getSavingsByUser(userId: string, search: string, sort: "ASC" | "DESC", currentPage?: number, limit?: number): Promise<{
         savings: SavingResponse[];
         total: any;
         totalPages: number;

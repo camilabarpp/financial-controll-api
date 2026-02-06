@@ -1,12 +1,11 @@
 import { SavingService } from './saving.service';
 import { SavingRequest } from './type/saving.request';
 import { User } from 'src/user/type/user.schema';
-import { PeriodType } from 'src/transaction/type/period-type.enum';
 import { SavingTransactionRequest } from './type/saving.transaction.request';
 export declare class SavingController {
     private readonly savingService;
     constructor(savingService: SavingService);
-    getSavingsByUser(user: User, period: PeriodType, search: string, sort: 'ASC' | 'DESC', currentPage?: number): Promise<{
+    getSavingsByUser(user: User, search: string, sort: string, currentPage?: number): Promise<{
         savings: import("./type/saving.response").SavingResponse[];
         total: any;
         totalPages: number;

@@ -18,13 +18,10 @@ export class SavingRepository {
         return this.savingModel.find({ user: userId }).exec();
     }
 
-    async searchSavingsByUser(userId: string, search: string, sort: 'ASC' | 'DESC', startDate: Date, endDate: Date, skip: number, limit: number) {
+    async searchSavingsByUser(userId: string, search: string, sort: 'ASC' | 'DESC', skip: number, limit: number) {
         const sortOrder = sort === 'ASC' ? 1 : -1;
     
-        const matchStage: any = {
-            user: userId,
-            createdAt: { $gte: startDate, $lte: endDate }
-        };
+        const matchStage: any = { user: userId };
     
         if (search && search.trim()) {
             matchStage.name = { $regex: search.trim(), $options: 'i' };

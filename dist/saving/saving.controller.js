@@ -19,15 +19,14 @@ const saving_service_1 = require("./saving.service");
 const saving_request_1 = require("./type/saving.request");
 const get_user_decorator_1 = require("../common/decorator/get-user.decorator");
 const user_schema_1 = require("../user/type/user.schema");
-const period_type_enum_1 = require("../transaction/type/period-type.enum");
 const saving_transaction_request_1 = require("./type/saving.transaction.request");
 let SavingController = class SavingController {
     savingService;
     constructor(savingService) {
         this.savingService = savingService;
     }
-    async getSavingsByUser(user, period, search, sort, currentPage = 1) {
-        return this.savingService.getSavingsByUser(user.id, period, search, sort, currentPage);
+    async getSavingsByUser(user, search, sort, currentPage = 1) {
+        return this.savingService.getSavingsByUser(user.id, search, sort, currentPage);
     }
     async getSavingTotals(user) {
         return this.savingService.getSavingTotals(user.id);
@@ -61,12 +60,11 @@ exports.SavingController = SavingController;
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, get_user_decorator_1.GetUser)()),
-    __param(1, (0, common_1.Query)('period')),
-    __param(2, (0, common_1.Query)('search')),
-    __param(3, (0, common_1.Query)('sort')),
-    __param(4, (0, common_1.Query)('currentPage')),
+    __param(1, (0, common_1.Query)('search')),
+    __param(2, (0, common_1.Query)('sort')),
+    __param(3, (0, common_1.Query)('currentPage')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_schema_1.User, String, String, String, Number]),
+    __metadata("design:paramtypes", [user_schema_1.User, String, String, Number]),
     __metadata("design:returntype", Promise)
 ], SavingController.prototype, "getSavingsByUser", null);
 __decorate([

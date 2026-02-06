@@ -31,12 +31,9 @@ let SavingRepository = class SavingRepository {
     async getAllSavingsByUser(userId) {
         return this.savingModel.find({ user: userId }).exec();
     }
-    async searchSavingsByUser(userId, search, sort, startDate, endDate, skip, limit) {
+    async searchSavingsByUser(userId, search, sort, skip, limit) {
         const sortOrder = sort === 'ASC' ? 1 : -1;
-        const matchStage = {
-            user: userId,
-            createdAt: { $gte: startDate, $lte: endDate }
-        };
+        const matchStage = { user: userId };
         if (search && search.trim()) {
             matchStage.name = { $regex: search.trim(), $options: 'i' };
         }

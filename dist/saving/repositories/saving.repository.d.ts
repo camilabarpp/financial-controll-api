@@ -12,7 +12,7 @@ export declare class SavingRepository {
     }> & {
         __v: number;
     })[]>;
-    searchSavingsByUser(userId: string, search: string, sort: 'ASC' | 'DESC', startDate: Date, endDate: Date, skip: number, limit: number): Promise<{
+    searchSavingsByUser(userId: string, search: string, sort: 'ASC' | 'DESC', skip: number, limit: number): Promise<{
         savings: any[];
         total: any;
     }>;

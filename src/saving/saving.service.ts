@@ -20,14 +20,11 @@ export class SavingService {
 
     async getSavingsByUser(
         userId: string,
-        period: PeriodType,
         search: string,
         sort: "ASC" | "DESC",
         currentPage: number = 1,
         limit: number = 10
     ) {
-        const startDate = await getStartDate(period);
-        const endDate = getEndDate(period);
 
         const skip = (currentPage - 1) * limit;
 
@@ -35,8 +32,6 @@ export class SavingService {
             userId,
             search,
             sort,
-            startDate,
-            endDate,
             skip,     
             limit
         );

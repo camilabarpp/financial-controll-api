@@ -15,12 +15,11 @@ export class SavingController {
     @Get()
     async getSavingsByUser(
         @GetUser() user: User,
-        @Query('period') period: PeriodType,
         @Query('search') search: string,
-        @Query('sort') sort: 'ASC' | 'DESC',
+        @Query('sort') sort: string,
         @Query('currentPage') currentPage: number = 1,
     ) {
-        return this.savingService.getSavingsByUser(user.id, period, search, sort, currentPage);
+        return this.savingService.getSavingsByUser(user.id, search, sort as 'ASC' | 'DESC', currentPage);
     }
 
     @Get('totals')

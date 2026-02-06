@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SavingService = void 0;
 const common_1 = require("@nestjs/common");
-const data_utils_1 = require("../common/utils/data-utils");
 const moment_1 = __importDefault(require("moment"));
 const saving_repository_1 = require("./repositories/saving.repository");
 const saving_transaction_repository_1 = require("./repositories/saving.transaction.repository");
@@ -26,11 +25,9 @@ let SavingService = class SavingService {
         this.savingRepository = savingRepository;
         this.savingTransactionRepository = savingTransactionRepository;
     }
-    async getSavingsByUser(userId, period, search, sort, currentPage = 1, limit = 10) {
-        const startDate = await (0, data_utils_1.getStartDate)(period);
-        const endDate = (0, data_utils_1.getEndDate)(period);
+    async getSavingsByUser(userId, search, sort, currentPage = 1, limit = 10) {
         const skip = (currentPage - 1) * limit;
-        const result = await this.savingRepository.searchSavingsByUser(userId, search, sort, startDate, endDate, skip, limit);
+        const result = await this.savingRepository.searchSavingsByUser(userId, search, sort, skip, limit);
         const totalPages = Math.ceil(result.total / limit);
         return {
             savings: result.savings.map(this.toResponse),
